@@ -196,7 +196,6 @@ tbody td{padding:8px 12px;color:#2D3748}
 <!-- ══════════ SIDEBAR ══════════ -->
 <aside class="sidebar" id="sb">
   <div class="sb-head">
-    <!-- Logo em SVG inline - Vigilância Ambiental DS7 -->
     <svg class="sb-logo" viewBox="0 0 160 44" xmlns="http://www.w3.org/2000/svg">
       <rect width="160" height="44" rx="6" fill="rgba(255,255,255,0.08)"/>
       <circle cx="22" cy="22" r="14" fill="none" stroke="#2EC4B6" stroke-width="2"/>
@@ -228,7 +227,6 @@ tbody td{padding:8px 12px;color:#2D3748}
   <!-- TOPBAR -->
   <header class="topbar">
     <div class="tb-left">
-      <!-- Logo DS7 SVG inline -->
       <svg class="logo-ds7" viewBox="0 0 120 44" xmlns="http://www.w3.org/2000/svg">
         <rect width="120" height="44" rx="6" fill="#0D2B6E"/>
         <text x="6" y="30" font-family="Segoe UI" font-size="26" font-weight="900" fill="white" opacity=".15">DS7</text>
@@ -539,21 +537,31 @@ function aplicarFiltros(){
 }
 
 /* ══════════════════════════════════════════════════
+   ✅ CORREÇÃO 1: HELPER PARA LER OBSERVAÇÃO
+   Lê o campo Observacao independente do nome original
+   da coluna (OBS, obs, observacao, observação, etc.)
+══════════════════════════════════════════════════ */
+function getObs(r){
+  return String(
+    r.Observacao ?? r.observacao ?? r.Observação ?? r.observação ?? ''
+  ).trim().toUpperCase();
+}
+
+/* ══════════════════════════════════════════════════
    INDICADORES
 ══════════════════════════════════════════════════ */
 function calc(d){
-  const obs=r=>(r.Observacao||'').trim().toUpperCase();
   const inst=d.length;
-  const pos=d.filter(r=>Number(r.N_Ovos)>0&&!['F','E','R','D'].includes(obs(r).charAt(0))).length;
+  const pos=d.filter(r=>Number(r.N_Ovos)>0 && !['F','E','R','D'].includes(getObs(r).charAt(0))).length;
   const ovos=d.reduce((s,r)=>s+Number(r.N_Ovos||0),0);
   const IPO=inst>0?(pos/inst)*100:0;
   const IDO=pos>0?ovos/pos:0;
-  const f=d.filter(r=>obs(r)==='F').length;
-  const e=d.filter(r=>obs(r)==='E').length;
-  const r=d.filter(r=>obs(r)==='R').length;
-  const dd=d.filter(r=>obs(r)==='D').length;
-  const rec=d.filter(r=>obs(r)==='REC').length;
-  return{inst,pos,ovos,IPO,IDO,f,e,r,d:dd,rec,pend:f+e};
+  const f=d.filter(r=>getObs(r)==='F').length;
+  const e=d.filter(r=>getObs(r)==='E').length;
+  const rv=d.filter(r=>getObs(r)==='R').length;
+  const dd=d.filter(r=>getObs(r)==='D').length;
+  const rec=d.filter(r=>getObs(r)==='REC').length;
+  return{inst,pos,ovos,IPO,IDO,f,e,r:rv,d:dd,rec,pend:f+e};
 }
 
 function nivelIPO(v){
@@ -755,11 +763,11 @@ function renderPendencias(d){
     [i.f,i.e,i.r,i.d,i.rec],['#E63946','#F4A261','#6C757D','#0077B6','#2EC4B6']);
 
   const bairros=[...new Set(d.map(r=>r.Bairro))].filter(Boolean).sort();
-  const pb=bairros.map(b=>d.filter(r=>r.Bairro===b&&['F','E'].includes((r.Observacao||'').trim().toUpperCase())).length);
+  const pb=bairros.map(b=>d.filter(r=>r.Bairro===b&&['F','E'].includes(getObs(r).charAt(0))).length);
   chBar('chPB',bairros,pb,'Pendências','#E63946');
 
   const ciclos=[...new Set(d.map(r=>r.Ciclo))].sort((a,b)=>Number(a)-Number(b));
-  const pc=ciclos.map(c=>d.filter(r=>r.Ciclo==c&&['F','E'].includes((r.Observacao||'').trim().toUpperCase())).length);
+  const pc=ciclos.map(c=>d.filter(r=>r.Ciclo==c&&['F','E'].includes(getObs(r).charAt(0))).length);
   chBar('chPC',ciclos.map(c=>'C'+c),pc,'Pendências','#F4A261');
 
   renderTabelaPend(d,'all');
@@ -767,9 +775,8 @@ function renderPendencias(d){
 }
 
 function renderTabelaPend(d,tipo){
-  const obs=r=>(r.Observacao||'').trim().toUpperCase();
-  let f=d.filter(r=>obs(r)!=='');
-  if(tipo!=='all') f=f.filter(r=>obs(r)===tipo);
+  let f=d.filter(r=>getObs(r)!=='');
+  if(tipo!=='all') f=f.filter(r=>getObs(r)===tipo);
   preencherTabela('tPend',f.slice(0,300),['ID_Ovitrampa','Bairro','Ciclo','Agente_Matricula','Data_Coleta','Observacao']);
 }
 
@@ -780,16 +787,22 @@ function preencherTabela(id,d,cols){
   const tbody=document.querySelector(`#${id} tbody`);
   if(!tbody)return;
   tbody.innerHTML=d.map(r=>`<tr>${cols.map(c=>{
-    if(c==='Observacao') return`<td>${badgeObs(r[c])}</td>`;
+    if(c==='Observacao') return`<td>${badgeObs(getObs(r))}</td>`;
     if(c==='N_Ovos')     return`<td><strong>${Number(r[c])||0}</strong></td>`;
     if(c==='Data_Coleta')return`<td>${fmtData(r[c])}</td>`;
     return`<td>${r[c]||'—'}</td>`;
   }).join('')}</tr>`).join('');
 }
 
-function badgeObs(o){
-  const v=(o||'').trim().toUpperCase();
-  const m={F:['bf','Fechada'],E:['be','Extraviada'],R:['br','Recusada'],D:['bd','Desocupada'],REC:['brec','Recuperada']};
+function badgeObs(v){
+  // v já vem normalizado em maiúsculas via getObs()
+  const m={
+    F:['bf','Fechada'],
+    E:['be','Extraviada'],
+    R:['br','Recusada'],
+    D:['bd','Desocupada'],
+    REC:['brec','Recuperada']
+  };
   if(!v||!m[v]) return'<span class="badge bok">Normal</span>';
   return`<span class="badge ${m[v][0]}">${m[v][1]}</span>`;
 }
@@ -905,15 +918,52 @@ function chDoughnut(id,labels,data,colors){
    MAPA
 ══════════════════════════════════════════════════ */
 let mapInst=null, mapInit=false;
+
+/* ══════════════════════════════════════════════════
+   ✅ CORREÇÃO 2: COORDENADAS DOS BAIRROS
+   - Adicionados bairros faltantes da planilha
+   - Corrigido "ALTO JOSE BONIFACIO" → com e sem acento
+   - Normalização de acento feita via normalizarBairro()
+══════════════════════════════════════════════════ */
 const BAIRRO_COORDS={
-  'ALTO JOSE BONIFACIO':{lat:-8.0330,lng:-34.9620},'ALTO JOSE DO PINHO':{lat:-8.0280,lng:-34.9580},
-  'MACAXEIRA':{lat:-8.0220,lng:-34.9540},'NOVA DESCOBERTA':{lat:-8.0190,lng:-34.9610},
-  'VASCO DA GAMA':{lat:-8.0420,lng:-34.9650},'MANGABEIRA':{lat:-8.0500,lng:-34.9560},
-  'DOIS UNIDOS':{lat:-8.0150,lng:-34.9450},'AGUA FRIA':{lat:-8.0260,lng:-34.9500},
-  'BOMBA DO HEMETERIO':{lat:-8.0350,lng:-34.9500},'CAMPO GRANDE':{lat:-8.0430,lng:-34.9490},
-  'FUNDAO':{lat:-8.0100,lng:-34.9420},'LINHA DO TIRO':{lat:-8.0200,lng:-34.9440},
-  'PORTO DA MADEIRA':{lat:-8.0160,lng:-34.9380},'BEBERIBE':{lat:-8.0090,lng:-34.9370},
+  // ── Bairros originais (mantidos) ──
+  'ALTO JOSE BONIFACIO'    :{lat:-8.0330,lng:-34.9620},
+  'ALTO JOSE DO PINHO'     :{lat:-8.0280,lng:-34.9580},
+  'MACAXEIRA'              :{lat:-8.0220,lng:-34.9540},
+  'NOVA DESCOBERTA'        :{lat:-8.0190,lng:-34.9610},
+  'VASCO DA GAMA'          :{lat:-8.0420,lng:-34.9650},
+  'MANGABEIRA'             :{lat:-8.0500,lng:-34.9560},
+  'DOIS UNIDOS'            :{lat:-8.0150,lng:-34.9450},
+  'AGUA FRIA'              :{lat:-8.0260,lng:-34.9500},
+  'BOMBA DO HEMETERIO'     :{lat:-8.0350,lng:-34.9500},
+  'CAMPO GRANDE'           :{lat:-8.0430,lng:-34.9490},
+  'FUNDAO'                 :{lat:-8.0100,lng:-34.9420},
+  'LINHA DO TIRO'          :{lat:-8.0200,lng:-34.9440},
+  'PORTO DA MADEIRA'       :{lat:-8.0160,lng:-34.9380},
+  'BEBERIBE'               :{lat:-8.0090,lng:-34.9370},
+  // ── ✅ Novos bairros adicionados ──
+  'MORRO DA CONCEICAO'     :{lat:-8.0310,lng:-34.9350},
+  'BREJO DA GUABIRABA'     :{lat:-8.0050,lng:-34.9280},
+  'CORREGO DO JENIPAPO'    :{lat:-8.0070,lng:-34.9310},
+  'BREJO DE BEBERIBE'      :{lat:-8.0060,lng:-34.9390},
+  'PASSARINHO'             :{lat:-8.0120,lng:-34.9310},
+  'GUABIRABA'              :{lat:-8.0020,lng:-34.9260},
+  'PAU FERRO'              :{lat:-7.9980,lng:-34.9240},
 };
+
+/**
+ * ✅ CORREÇÃO 3: Normaliza o nome do bairro
+ * Remove acentos e converte para maiúsculas,
+ * garantindo match mesmo quando a planilha usa acentos
+ * (ex: "ALTO JOSÉ BONIFÁCIO" → "ALTO JOSE BONIFACIO")
+ */
+function normalizarBairro(nome){
+  return (nome||'')
+    .toUpperCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .trim();
+}
 
 function initMapa(){
   document.querySelector('[data-s="mapa"]').addEventListener('click',()=>{
@@ -932,12 +982,18 @@ function criarMapa(){
 function renderMapaData(d){
   if(!mapInst){criarMapa();mapInit=true;return;}
   mapInst.eachLayer(l=>{if(l instanceof L.CircleMarker)mapInst.removeLayer(l);});
+
   const bairros=[...new Set(d.map(r=>(r.Bairro||'').toUpperCase().trim()))].filter(Boolean);
+
   bairros.forEach(b=>{
     const dd=d.filter(r=>(r.Bairro||'').toUpperCase().trim()===b);
     const i=calc(dd);
-    const coords=BAIRRO_COORDS[b];
+
+    // ✅ Usa bairro normalizado (sem acento) para buscar coordenadas
+    const bNorm=normalizarBairro(b);
+    const coords=BAIRRO_COORDS[bNorm];
     if(!coords)return;
+
     const n=nivelIPO(i.IPO);
     const raio=Math.min(18+i.inst*1.5,55);
     L.circleMarker([coords.lat,coords.lng],{radius:raio,fillColor:n.c,color:'#fff',weight:2,opacity:1,fillOpacity:.75})
@@ -957,9 +1013,14 @@ function renderMapaData(d){
 }
 
 /* ══════════════════════════════════════════════════
-   UPLOAD EXCEL
+   ✅ CORREÇÃO 4: MAPEAMENTO DE COLUNAS (COL_MAP)
+   Adicionadas todas as variantes da coluna OBS:
+   obs, obs., observações, observacoes, etc.
+   Também: normalização dinâmica para colunas
+   que comecem com "obs"
 ══════════════════════════════════════════════════ */
 const COL_MAP={
+  // ── Colunas gerais ──
   'ano':'Ano','ciclo':'Ciclo','ciclos':'Ciclo','ds':'Distrito_Sanitario',
   'bairro':'Bairro','bairro_area':'Bairro_Area',
   'agente / matrícula':'Agente_Matricula','agente/matricula':'Agente_Matricula',
@@ -969,11 +1030,23 @@ const COL_MAP={
   'dt_entrega_apoio':'Data_Entrega_Apoio','dt_entrega_lab':'Data_Entrega_Laboratorio',
   'dt_leitura':'Data_Leitura','nm_tec_lab':'Tecnico_Laboratorio',
   'dt_dig':'Data_Digitacao','dt_envio_ds':'Data_Envio_DS',
-  'n_ovos':'N_Ovos','numero_ovos':'N_Ovos',
-  'observação':'Observacao','observacao':'Observacao',
-  'distrito_sanitario':'Distrito_Sanitario','data_entrega_laboratorio':'Data_Entrega_Laboratorio',
-  'tecnico_laboratorio':'Tecnico_Laboratorio','data_digitacao':'Data_Digitacao',
-  'data_envio_ds':'Data_Envio_DS','data_leitura':'Data_Leitura','data_entrega_apoio':'Data_Entrega_Apoio',
+  'n_ovos':'N_Ovos','numero_ovos':'N_Ovos','num_ovos':'N_Ovos','nº ovos':'N_Ovos',
+  'distrito_sanitario':'Distrito_Sanitario',
+  'data_entrega_laboratorio':'Data_Entrega_Laboratorio',
+  'tecnico_laboratorio':'Tecnico_Laboratorio',
+  'data_digitacao':'Data_Digitacao','data_envio_ds':'Data_Envio_DS',
+  'data_leitura':'Data_Leitura','data_entrega_apoio':'Data_Entrega_Apoio',
+  // ── ✅ Variantes da coluna OBS/Observação ──
+  'obs':'Observacao',
+  'obs.':'Observacao',
+  'observação':'Observacao',
+  'observacao':'Observacao',
+  'observações':'Observacao',
+  'observacoes':'Observacao',
+  'observação (f/e/r/d/rec)':'Observacao',
+  'status':'Observacao',
+  'situacao':'Observacao',
+  'situação':'Observacao',
 };
 
 let dadosPrev=[];
@@ -1027,12 +1100,23 @@ function processFile(file){
   r.readAsArrayBuffer(file);
 }
 
+/* ✅ normCols atualizado: detecta colunas iniciadas com "obs" dinamicamente */
 function normCols(raw){
   if(!raw.length)return[];
   const mapa={};
   Object.keys(raw[0]).forEach(col=>{
     const k=col.toLowerCase().trim();
-    mapa[col]=COL_MAP[k]||col;
+    // Mapeamento direto via tabela
+    if(COL_MAP[k]){
+      mapa[col]=COL_MAP[k];
+    }
+    // ✅ Fallback dinâmico: qualquer coluna que comece com "obs" → Observacao
+    else if(k.startsWith('obs')){
+      mapa[col]='Observacao';
+    }
+    else{
+      mapa[col]=col;
+    }
   });
   return raw.map(row=>{
     const n={};
