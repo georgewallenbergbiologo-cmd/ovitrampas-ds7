@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ovitrampas | DS VII - Recife</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+/* ══════════════════════════════════════════
+   RESET & VARIÁVEIS
+══════════════════════════════════════════ */
+:root{
+  --primary:#0D2B6E;--primary-light:#1A4BA0;--primary-dark:#081A4A;
+  --accent:#00B4D8;--green:#2EC4B6;--green-dark:#1A9E95;
+  --orange:#F4A261;--red:#E63946;--purple:#7B2D8B;
+  --cyan:#00B4D8;--gray:#6C757D;--bg:#F0F4F8;--surface:#fff;
+  --sw:240px;--swc:64px;--radius:12px;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --shadow-md:0 4px 24px rgba(0,0,0,.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1E2D40;display:flex;min-height:100vh;overflow-x:hidden}
+
+/* ══ SIDEBAR ══ */
+.sidebar{width:var(--sw);min-height:100vh;background:linear-gradient(180deg,var(--primary-dark),var(--primary) 60%,var(--primary-light));display:flex;flex-direction:column;position:fixed;left:0;top:0;z-index:100;transition:.25s;box-shadow:3px 0 20px rgba(8,26,74,.3)}
+.sidebar.col{width:var(--swc)}
+.sb-head{display:flex;align-items:center;justify-content:space-between;padding:16px 14px;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px}
+.sb-logo{height:42px;object-fit:contain;transition:.2s}
+.sidebar.col .sb-logo{opacity:0;width:0;overflow:hidden}
+.btn-tog{background:rgba(255,255,255,.12);border:none;color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:1rem;flex-shrink:0;transition:.2s}
+.btn-tog:hover{background:rgba(255,255,255,.22)}
+.sb-nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 18px;color:rgba(255,255,255,.72);text-decoration:none;font-size:.88rem;font-weight:500;transition:.2s;border-left:3px solid transparent;white-space:nowrap;overflow:hidden;cursor:pointer}
+.nav-item i{font-size:.95rem;width:20px;text-align:center;flex-shrink:0}
+.nav-item:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav-item.active{background:rgba(0,180,216,.18);color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.sidebar.col .nav-item span{display:none}
+.sidebar.col .nav-item{justify-content:center;padding:14px}
+.sb-foot{padding:12px;border-top:1px solid rgba(255,255,255,.1)}
+.btn-upload{width:100%;background:linear-gradient(135deg,#1A9E95,#00B4D8);border:none;color:#fff;padding:11px 14px;border-radius:10px;font-size:.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;transition:.2s;white-space:nowrap;overflow:hidden}
+.btn-upload:hover{opacity:.85}
+.sidebar.col .btn-upload{justify-content:center}
+.sidebar.col .btn-upload span{display:none}
+
+/* ══ MAIN ══ */
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;transition:.25s}
+.main.exp{margin-left:var(--swc)}
+
+/* ══ TOPBAR ══ */
+.topbar{background:#fff;padding:12px 24px;box-shadow:var(--shadow);position:sticky;top:0;z-index:90;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px solid var(--primary)}
+.tb-left{display:flex;align-items:center;gap:14px}
+.logo-ds7{height:44px;object-fit:contain}
+.tb-title h1{font-size:1.1rem;font-weight:800;color:var(--primary);line-height:1.2}
+.tb-title p{font-size:.75rem;color:var(--gray)}
+.tb-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fg{display:flex;flex-direction:column;gap:2px}
+.fg label{font-size:.67rem;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.fg select{padding:6px 10px;border:1.5px solid #D1D9E6;border-radius:8px;font-size:.82rem;color:var(--primary);background:#F7FAFC;cursor:pointer;min-width:100px}
+.btn-pdf{background:var(--red);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s}
+.btn-pdf:hover{opacity:.85}
+
+/* ══ SECTIONS ══ */
+.sec{display:none;padding:22px 24px;animation:fi .3s ease}
+.sec.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sec-hdr{margin-bottom:18px}
+.sec-hdr h2{font-size:1.2rem;font-weight:800;color:var(--primary);display:flex;align-items:center;gap:9px}
+.sec-hdr h2 i{color:var(--accent)}
+
+/* ══ CARDS ══ */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+.card{background:#fff;border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);border-left:4px solid transparent;transition:.2s;cursor:default}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.c-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}
+.c-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.c-lbl{font-size:.68rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.04em;line-height:1.3}
+.c-val{font-size:1.65rem;font-weight:900;line-height:1;letter-spacing:-.02em}
+.c-sub{font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:20px;width:fit-content;margin-top:2px}
+.cb{border-left-color:#1A4BA0}.cb .c-icon{background:rgba(26,75,160,.1);color:#1A4BA0}.cb .c-val{color:#1A4BA0}
+.cg{border-left-color:#2EC4B6}.cg .c-icon{background:rgba(46,196,182,.12);color:#1A9E95}.cg .c-val{color:#1A9E95}
+.ct{border-left-color:#0077B6}.ct .c-icon{background:rgba(0,119,182,.1);color:#0077B6}.ct .c-val{color:#0077B6}
+.co{border-left-color:#F4A261}.co .c-icon{background:rgba(244,162,97,.13);color:#C87A35}.co .c-val{color:#C87A35}
+.cp{border-left-color:#7B2D8B}.cp .c-icon{background:rgba(123,45,139,.1);color:#7B2D8B}.cp .c-val{color:#7B2D8B}
+.cr{border-left-color:#E63946}.cr .c-icon{background:rgba(230,57,70,.1);color:#E63946}.cr .c-val{color:#E63946}
+.cc{border-left-color:#00B4D8}.cc .c-icon{background:rgba(0,180,216,.1);color:#0077B6}.cc .c-val{color:#0077B6}
+.cgr{border-left-color:#6C757D}.cgr .c-icon{background:rgba(108,117,125,.1);color:#6C757D}.cgr .c-val{color:#6C757D}
+
+/* ══ CHARTS ══ */
+.charts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:18px}
+.chart-card{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.chart-card.lg{grid-column:span 2}
+.chart-card h3{font-size:.8rem;font-weight:800;color:var(--primary);margin-bottom:14px;text-transform:uppercase;letter-spacing:.03em;display:flex;align-items:center;gap:7px}
+.chart-card h3 i{color:var(--accent)}
+.chart-card canvas{max-height:250px;width:100%!important}
+
+/* ══ TABLES ══ */
+.tbl-card{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}
+.tbl-card h3{font-size:.8rem;font-weight:800;color:var(--primary);margin-bottom:12px;text-transform:uppercase;letter-spacing:.03em}
+.tbl-wrap{overflow-x:auto;max-height:380px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead tr{background:var(--primary);color:#fff;position:sticky;top:0;z-index:1}
+thead th{padding:9px 12px;text-align:left;font-weight:700;font-size:.72rem;text-transform:uppercase;white-space:nowrap}
+tbody tr{border-bottom:1px solid #EEF2F7;transition:.15s}
+tbody tr:hover{background:#F0F7FF}
+tbody td{padding:8px 12px;color:#2D3748}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.68rem;font-weight:700;text-transform:uppercase}
+.bf{background:#FFE0E0;color:#C0392B}
+.be{background:#FFF3CD;color:#856404}
+.br{background:#E2E3E5;color:#383D41}
+.bd{background:#D1ECF1;color:#0C5460}
+.brec{background:#D4EDDA;color:#155724}
+.bok{background:#D4EDDA;color:#155724}
+
+/* ══ FILTER ROW ══ */
+.frow{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.inp-s{padding:8px 12px;border:1.5px solid #D1D9E6;border-radius:8px;font-size:.84rem;color:var(--primary);min-width:240px;transition:.2s}
+.inp-s:focus{outline:none;border-color:var(--accent)}
+.frow select{padding:8px 12px;border:1.5px solid #D1D9E6;border-radius:8px;font-size:.82rem;color:var(--primary);cursor:pointer}
+
+/* ══ RANKING ══ */
+.rank-list{display:flex;flex-direction:column;gap:7px;max-height:280px;overflow-y:auto}
+.rank-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#F7FAFC;border-radius:8px}
+.rank-pos{font-weight:900;font-size:.95rem;color:var(--primary);width:22px;text-align:center}
+.rank-lbl{flex:1;font-size:.8rem;font-weight:600}
+.rank-bw{flex:2;height:6px;background:#E2E8F0;border-radius:3px;overflow:hidden}
+.rank-b{height:100%;border-radius:3px;transition:width .6s}
+.rank-v{font-size:.8rem;font-weight:800;color:var(--primary);min-width:42px;text-align:right}
+
+/* ══ MAPA ══ */
+.mapa-wrap{display:flex;gap:14px;height:500px}
+#mapa{flex:1;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.mapa-leg{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);min-width:155px}
+.mapa-leg h4{font-size:.82rem;font-weight:800;color:var(--primary);margin-bottom:10px;text-transform:uppercase}
+.leg-item{display:flex;align-items:center;gap:8px;font-size:.8rem;margin-bottom:7px}
+.dot{width:13px;height:13px;border-radius:50%;flex-shrink:0}
+.dv{background:#2EC4B6}.da{background:#F9C74F}.dl{background:#F4A261}.dr{background:#E63946}
+
+/* ══ INFO BOX ══ */
+.info-box{background:#F7FAFC;border-radius:10px;padding:14px;font-size:.82rem;color:var(--gray);min-height:100px}
+.info-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #E2E8F0;font-size:.8rem}
+.info-row strong{color:var(--primary)}
+
+/* ══ ESTADO VAZIO ══ */
+.empty-state{text-align:center;padding:50px 20px;color:var(--gray)}
+.empty-state i{font-size:3.5rem;opacity:.25;display:block;margin-bottom:14px}
+.empty-state h3{font-size:1rem;font-weight:700;margin-bottom:6px;color:var(--primary)}
+.empty-state p{font-size:.84rem}
+.empty-state .btn-start{margin-top:16px;background:var(--green);color:#fff;border:none;padding:10px 22px;border-radius:9px;font-size:.88rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+
+/* ══ MODAL ══ */
+.modal-ov{position:fixed;inset:0;background:rgba(8,26,74,.55);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.25s}
+.modal-ov.active{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:16px;width:660px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(8,26,74,.28);transform:translateY(14px);transition:.25s;overflow:hidden}
+.modal-ov.active .modal{transform:none}
+.m-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:var(--primary);color:#fff}
+.m-head h3{font-size:.95rem;font-weight:800;display:flex;align-items:center;gap:9px}
+.m-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem}
+.m-body{padding:22px;overflow-y:auto;flex:1}
+.drop-z{border:2px dashed #CBD5E1;border-radius:12px;padding:38px 20px;text-align:center;cursor:pointer;transition:.2s}
+.drop-z:hover,.drop-z.dov{border-color:var(--accent);background:rgba(0,180,216,.04)}
+.drop-z i{font-size:3rem;color:var(--accent);margin-bottom:10px;display:block}
+.drop-z p{font-size:.92rem;color:#4A5568;margin-bottom:5px}
+.drop-z span{font-size:.8rem;color:var(--gray);display:block;margin-bottom:12px}
+.btn-sel{background:var(--primary);color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer}
+.prev-info{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F0FFF4;border-radius:8px;margin-bottom:12px;font-size:.85rem}
+.prev-info .ico-xl{color:#28a745;font-size:1.5rem}
+.prev-wrap{overflow-x:auto;max-height:200px;border:1px solid #EEF2F7;border-radius:8px}
+.m-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 22px;border-top:1px solid #EEF2F7}
+.btn-can{background:#F1F5F9;color:#4A5568;border:none;padding:9px 18px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer}
+.btn-ok{background:var(--green);color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px}
+.btn-ok:disabled{opacity:.4;cursor:not-allowed}
+.hidden{display:none!important}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:26px;right:26px;background:#1E2D40;color:#fff;padding:12px 20px;border-radius:10px;font-size:.85rem;font-weight:600;box-shadow:var(--shadow-md);transform:translateY(70px);opacity:0;transition:.35s;z-index:300;display:flex;align-items:center;gap:9px}
+.toast.show{transform:none;opacity:1}
+.toast.ok{background:var(--green-dark)}
+.toast.err{background:var(--red)}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:900px){
+  .sidebar{width:var(--swc)}
+  .sidebar .nav-item span,.sidebar .btn-upload span,.sidebar .sb-logo{display:none}
+  .sidebar .nav-item{justify-content:center}
+  .sidebar .btn-upload{justify-content:center}
+  .main{margin-left:var(--swc)}
+  .chart-card.lg{grid-column:span 1}
+  .topbar{padding:10px 14px}
+  .sec{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar" id="sb">
+  <div class="sb-head">
+    <!-- Logo em SVG inline - Vigilância Ambiental DS7 -->
+    <svg class="sb-logo" viewBox="0 0 160 44" xmlns="http://www.w3.org/2000/svg">
+      <rect width="160" height="44" rx="6" fill="rgba(255,255,255,0.08)"/>
+      <circle cx="22" cy="22" r="14" fill="none" stroke="#2EC4B6" stroke-width="2"/>
+      <path d="M15 22 Q22 12 29 22 Q22 32 15 22Z" fill="#2EC4B6" opacity=".7"/>
+      <text x="40" y="17" font-family="Segoe UI" font-size="9" font-weight="800" fill="#fff">VIGILÂNCIA</text>
+      <text x="40" y="28" font-family="Segoe UI" font-size="9" font-weight="800" fill="#2EC4B6">AMBIENTAL</text>
+      <text x="40" y="39" font-family="Segoe UI" font-size="7.5" fill="rgba(255,255,255,.6)">DS VII · Recife</text>
+    </svg>
+    <button class="btn-tog" id="btnTog"><i class="fas fa-bars"></i></button>
+  </div>
+  <nav class="sb-nav">
+    <a class="nav-item active" data-s="overview"><i class="fas fa-chart-pie"></i><span>Visão Geral</span></a>
+    <a class="nav-item" data-s="ovitrampa"><i class="fas fa-crosshairs"></i><span>Por Ovitrampa</span></a>
+    <a class="nav-item" data-s="bairro"><i class="fas fa-map-marker-alt"></i><span>Por Bairro</span></a>
+    <a class="nav-item" data-s="ciclo"><i class="fas fa-sync-alt"></i><span>Por Ciclo</span></a>
+    <a class="nav-item" data-s="agente"><i class="fas fa-user-shield"></i><span>Por Agente</span></a>
+    <a class="nav-item" data-s="pendencias"><i class="fas fa-exclamation-triangle"></i><span>Pendências</span></a>
+    <a class="nav-item" data-s="mapa"><i class="fas fa-map"></i><span>Mapa</span></a>
+  </nav>
+  <div class="sb-foot">
+    <button class="btn-upload" id="btnUp"><i class="fas fa-file-excel"></i><span>Importar Planilha</span></button>
+    <input type="file" id="fileIn" accept=".xlsx,.xls,.csv" hidden/>
+  </div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<main class="main" id="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="tb-left">
+      <!-- Logo DS7 SVG inline -->
+      <svg class="logo-ds7" viewBox="0 0 120 44" xmlns="http://www.w3.org/2000/svg">
+        <rect width="120" height="44" rx="6" fill="#0D2B6E"/>
+        <text x="6" y="30" font-family="Segoe UI" font-size="26" font-weight="900" fill="white" opacity=".15">DS7</text>
+        <text x="7" y="29" font-family="Segoe UI" font-size="26" font-weight="900" fill="white">DS</text>
+        <text x="54" y="29" font-family="Segoe UI" font-size="26" font-weight="900" fill="#2EC4B6">7</text>
+        <text x="7" y="40" font-family="Segoe UI" font-size="6.5" font-weight="600" fill="rgba(255,255,255,.7)" letter-spacing="1">DISTRITO SANITÁRIO VII</text>
+      </svg>
+      <div class="tb-title">
+        <h1>Monitoramento de Ovitrampas</h1>
+        <p>Vigilância Ambiental · Distrito Sanitário VII · Recife / PE</p>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="fg"><label><i class="fas fa-calendar-alt"></i> Ano</label>
+        <select id="fAno"><option value="all">Todos</option></select></div>
+      <div class="fg"><label><i class="fas fa-sync-alt"></i> Ciclo</label>
+        <select id="fCiclo"><option value="all">Todos</option></select></div>
+      <div class="fg"><label><i class="fas fa-map-marker-alt"></i> Bairro</label>
+        <select id="fBairro"><option value="all">Todos</option></select></div>
+      <button class="btn-pdf" id="btnPDF"><i class="fas fa-file-pdf"></i> PDF</button>
+    </div>
+  </header>
+
+  <!-- ── VISÃO GERAL ── -->
+  <section class="sec active" id="sec-overview">
+    <div id="emptyOverview" class="empty-state">
+      <i class="fas fa-database"></i>
+      <h3>Nenhum dado carregado</h3>
+      <p>Importe uma planilha Excel para visualizar os indicadores</p>
+      <button class="btn-start" onclick="document.getElementById('btnUp').click()">
+        <i class="fas fa-file-excel"></i> Importar Planilha
+      </button>
+    </div>
+    <div id="dashContent" class="hidden">
+      <div class="cards-grid">
+        <div class="card cb"><div class="c-icon"><i class="fas fa-box-open"></i></div>
+          <div class="c-info"><span class="c-lbl">Instaladas</span><span class="c-val" id="vIns">—</span></div></div>
+        <div class="card cg"><div class="c-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="c-info"><span class="c-lbl">Positivas</span><span class="c-val" id="vPos">—</span></div></div>
+        <div class="card ct"><div class="c-icon"><i class="fas fa-percent"></i></div>
+          <div class="c-info"><span class="c-lbl">IPO</span><span class="c-val" id="vIPO">—</span>
+          <span class="c-sub" id="sIPO"></span></div></div>
+        <div class="card co"><div class="c-icon"><i class="fas fa-chart-bar"></i></div>
+          <div class="c-info"><span class="c-lbl">IDO</span><span class="c-val" id="vIDO">—</span>
+          <span class="c-sub" id="sIDO"></span></div></div>
+        <div class="card cp"><div class="c-icon"><i class="fas fa-egg"></i></div>
+          <div class="c-info"><span class="c-lbl">Total Ovos</span><span class="c-val" id="vOvos">—</span></div></div>
+        <div class="card cr"><div class="c-icon"><i class="fas fa-lock"></i></div>
+          <div class="c-info"><span class="c-lbl">Fechadas/Extraviadas</span><span class="c-val" id="vPend">—</span></div></div>
+        <div class="card cc"><div class="c-icon"><i class="fas fa-undo-alt"></i></div>
+          <div class="c-info"><span class="c-lbl">Recuperadas</span><span class="c-val" id="vRec">—</span></div></div>
+        <div class="card cgr"><div class="c-icon"><i class="fas fa-ban"></i></div>
+          <div class="c-info"><span class="c-lbl">Recusadas/Desocup.</span><span class="c-val" id="vOut">—</span></div></div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card lg"><h3><i class="fas fa-chart-line"></i> Evolução IPO e IDO por Ciclo</h3><canvas id="chEv"></canvas></div>
+        <div class="chart-card"><h3><i class="fas fa-egg"></i> Ovos por Ciclo</h3><canvas id="chOC"></canvas></div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card"><h3><i class="fas fa-map-marker-alt"></i> IPO por Bairro</h3><canvas id="chIB"></canvas></div>
+        <div class="chart-card"><h3><i class="fas fa-circle-info"></i> Status das Ovitrampas</h3><canvas id="chSt"></canvas></div>
+        <div class="chart-card"><h3><i class="fas fa-user-shield"></i> Ovos por Agente</h3><canvas id="chAg"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── POR OVITRAMPA ── -->
+  <section class="sec" id="sec-ovitrampa">
+    <div class="sec-hdr"><h2><i class="fas fa-crosshairs"></i> Análise por Ovitrampa</h2></div>
+    <div class="frow"><input class="inp-s" id="buscaOvt" placeholder="🔍 Digite o ID da Ovitrampa..."/></div>
+    <div class="charts-row">
+      <div class="chart-card lg"><h3>Histórico de Ovos por Ciclo</h3><canvas id="chOvtC"></canvas></div>
+      <div class="chart-card"><h3>Indicadores</h3><div class="info-box" id="infoOvt"><p>Busque uma ovitrampa acima.</p></div></div>
+    </div>
+    <div class="tbl-card"><h3>Registros</h3>
+      <div class="tbl-wrap"><table id="tOvt">
+        <thead><tr><th>ID</th><th>Bairro</th><th>Ciclo</th><th>Agente</th><th>Coleta</th><th>Nº Ovos</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ── POR BAIRRO ── -->
+  <section class="sec" id="sec-bairro">
+    <div class="sec-hdr"><h2><i class="fas fa-map-marker-alt"></i> Análise por Bairro</h2></div>
+    <div class="charts-row">
+      <div class="chart-card lg"><h3><i class="fas fa-percent"></i> IPO por Bairro</h3><canvas id="chBIPO"></canvas></div>
+      <div class="chart-card"><h3><i class="fas fa-chart-bar"></i> IDO por Bairro</h3><canvas id="chBIDO"></canvas></div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card lg"><h3><i class="fas fa-egg"></i> Total de Ovos por Bairro</h3><canvas id="chBOv"></canvas></div>
+      <div class="chart-card"><h3><i class="fas fa-trophy"></i> Ranking de Infestação (IPO)</h3><div class="rank-list" id="rankB"></div></div>
+    </div>
+  </section>
+
+  <!-- ── POR CICLO ── -->
+  <section class="sec" id="sec-ciclo">
+    <div class="sec-hdr"><h2><i class="fas fa-sync-alt"></i> Análise por Ciclo</h2></div>
+    <div class="cards-grid" id="cardsCiclo"></div>
+    <div class="charts-row">
+      <div class="chart-card lg"><h3><i class="fas fa-chart-line"></i> Comparativo de Ciclos</h3><canvas id="chCC"></canvas></div>
+      <div class="chart-card"><h3><i class="fas fa-circle-info"></i> Distribuição por Status</h3><canvas id="chCSt"></canvas></div>
+    </div>
+    <div class="tbl-card"><h3>Resumo por Ciclo</h3>
+      <div class="tbl-wrap"><table id="tCiclo">
+        <thead><tr><th>Ciclo</th><th>Ano</th><th>Instaladas</th><th>Positivas</th><th>IPO</th><th>IDO</th><th>Total Ovos</th><th>Pendências</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ── POR AGENTE ── -->
+  <section class="sec" id="sec-agente">
+    <div class="sec-hdr"><h2><i class="fas fa-user-shield"></i> Análise por Agente</h2></div>
+    <div class="frow"><input class="inp-s" id="buscaAg" placeholder="🔍 Buscar agente ou matrícula..."/></div>
+    <div class="charts-row">
+      <div class="chart-card lg"><h3><i class="fas fa-egg"></i> Ovos Coletados por Agente</h3><canvas id="chAgO"></canvas></div>
+      <div class="chart-card"><h3><i class="fas fa-star"></i> Ranking de Produtividade</h3><div class="rank-list" id="rankAg"></div></div>
+    </div>
+    <div class="tbl-card"><h3>Desempenho por Agente</h3>
+      <div class="tbl-wrap"><table id="tAg">
+        <thead><tr><th>Agente / Matrícula</th><th>Bairros</th><th>OVTs</th><th>Positivas</th><th>Total Ovos</th><th>IPO</th><th>IDO</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ── PENDÊNCIAS ── -->
+  <section class="sec" id="sec-pendencias">
+    <div class="sec-hdr"><h2><i class="fas fa-exclamation-triangle"></i> Pendências e Ocorrências</h2></div>
+    <div class="cards-grid">
+      <div class="card cr"><div class="c-icon"><i class="fas fa-lock"></i></div><div class="c-info"><span class="c-lbl">Fechadas (F)</span><span class="c-val" id="pF">—</span></div></div>
+      <div class="card co"><div class="c-icon"><i class="fas fa-question-circle"></i></div><div class="c-info"><span class="c-lbl">Extraviadas (E)</span><span class="c-val" id="pE">—</span></div></div>
+      <div class="card cgr"><div class="c-icon"><i class="fas fa-hand-paper"></i></div><div class="c-info"><span class="c-lbl">Recusadas (R)</span><span class="c-val" id="pR">—</span></div></div>
+      <div class="card cp"><div class="c-icon"><i class="fas fa-home"></i></div><div class="c-info"><span class="c-lbl">Desocupadas (D)</span><span class="c-val" id="pD">—</span></div></div>
+      <div class="card cc"><div class="c-icon"><i class="fas fa-undo-alt"></i></div><div class="c-info"><span class="c-lbl">Recuperadas (Rec)</span><span class="c-val" id="pRec">—</span></div></div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card"><h3>Por Tipo</h3><canvas id="chPT"></canvas></div>
+      <div class="chart-card"><h3>Por Bairro</h3><canvas id="chPB"></canvas></div>
+      <div class="chart-card"><h3>Por Ciclo</h3><canvas id="chPC"></canvas></div>
+    </div>
+    <div class="frow">
+      <select id="fPend">
+        <option value="all">Todos os Tipos</option>
+        <option value="F">Fechadas</option><option value="E">Extraviadas</option>
+        <option value="R">Recusadas</option><option value="D">Desocupadas</option>
+        <option value="REC">Recuperadas</option>
+      </select>
+    </div>
+    <div class="tbl-card"><h3>Listagem</h3>
+      <div class="tbl-wrap"><table id="tPend">
+        <thead><tr><th>ID Ovitrampa</th><th>Bairro</th><th>Ciclo</th><th>Agente</th><th>Coleta</th><th>Tipo</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ── MAPA ── -->
+  <section class="sec" id="sec-mapa">
+    <div class="sec-hdr"><h2><i class="fas fa-map"></i> Mapa de Infestação — DS VII</h2></div>
+    <div class="mapa-wrap">
+      <div id="mapa"></div>
+      <div class="mapa-leg">
+        <h4><i class="fas fa-circle-info"></i> Nível IPO</h4>
+        <div class="leg-item"><span class="dot dv"></span> Baixo (&lt;25%)</div>
+        <div class="leg-item"><span class="dot da"></span> Médio (25–50%)</div>
+        <div class="leg-item"><span class="dot dl"></span> Alto (50–75%)</div>
+        <div class="leg-item"><span class="dot dr"></span> Muito Alto (&gt;75%)</div>
+        <hr style="margin:12px 0;border-color:#EEF2F7">
+        <h4 style="margin-bottom:8px">Legenda</h4>
+        <div class="leg-item" style="font-size:.75rem"><i class="fas fa-circle" style="color:#0077B6;margin-right:4px"></i>Bairro com dados</div>
+        <div class="leg-item" style="font-size:.75rem">Tamanho ∝ Nº de OVTs</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL UPLOAD -->
+<div class="modal-ov" id="modalUp">
+  <div class="modal">
+    <div class="m-head">
+      <h3><i class="fas fa-file-excel"></i> Importar Planilha de Ciclo</h3>
+      <button class="m-close" id="mClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="m-body">
+      <div class="drop-z" id="dropZ">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>Arraste o arquivo Excel aqui</p>
+        <span>ou</span>
+        <button class="btn-sel" onclick="document.getElementById('fileIn').click()">Selecionar Arquivo</button>
+        <p style="font-size:.75rem;color:#A0AEC0;margin-top:10px">Aceito: .xlsx · .xls · .csv</p>
+      </div>
+      <div id="prevWrap" class="hidden">
+        <div class="prev-info">
+          <i class="fas fa-file-excel ico-xl"></i>
+          <div><strong id="prevNome"></strong><br/><span id="prevQtd" style="font-size:.78rem;color:var(--gray)"></span></div>
+        </div>
+        <div class="prev-wrap"><table id="tPrev"></table></div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn-can" id="mCan">Cancelar</button>
+      <button class="btn-ok" id="mOk" disabled><i class="fas fa-check"></i> Confirmar Importação</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fas fa-info-circle"></i><span id="toastMsg"></span></div>
+
+<!-- SCRIPTS CDN -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+const S = { raw:[], fil:[], f:{ano:'all',ciclo:'all',bairro:'all'} };
+const _ch = {};
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded',()=>{
+  initSidebar(); initNav(); initFiltros(); initUpload(); initMapa();
+  carregarLocal();
+});
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════ */
+function initSidebar(){
+  document.getElementById('btnTog').onclick=()=>{
+    document.getElementById('sb').classList.toggle('col');
+    document.getElementById('main').classList.toggle('exp');
+  };
+}
+
+/* ══════════════════════════════════════════════════
+   NAVEGAÇÃO
+══════════════════════════════════════════════════ */
+function initNav(){
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.addEventListener('click',e=>{
+      e.preventDefault();
+      const s=el.dataset.s;
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      el.classList.add('active');
+      document.querySelectorAll('.sec').forEach(sec=>sec.classList.remove('active'));
+      document.getElementById('sec-'+s)?.classList.add('active');
+      if(S.fil.length) renderSec(s);
+    });
+  });
+}
+
+function renderSec(s){
+  const d=S.fil;
+  if(!d.length)return;
+  ({overview:()=>renderOverview(d),
+    ovitrampa:()=>renderOvitrampa(d),
+    bairro:()=>renderBairro(d),
+    ciclo:()=>renderCiclo(d),
+    agente:()=>renderAgente(d),
+    pendencias:()=>renderPendencias(d),
+    mapa:()=>renderMapaData(d)
+  })[s]?.();
+}
+
+/* ══════════════════════════════════════════════════
+   FILTROS
+══════════════════════════════════════════════════ */
+function initFiltros(){
+  ['fAno','fCiclo','fBairro'].forEach(id=>
+    document.getElementById(id).addEventListener('change',aplicarFiltros));
+  document.getElementById('btnPDF').onclick=()=>window.print();
+}
+
+function popularFiltros(d){
+  const anos=[...new Set(d.map(r=>r.Ano))].sort();
+  const ciclos=[...new Set(d.map(r=>r.Ciclo))].sort((a,b)=>Number(a)-Number(b));
+  const bairros=[...new Set(d.map(r=>r.Bairro))].filter(Boolean).sort();
+  fillSel('fAno',anos,'Todos os Anos');
+  fillSel('fCiclo',ciclos,'Todos os Ciclos');
+  fillSel('fBairro',bairros,'Todos os Bairros');
+}
+
+function fillSel(id,vals,lbl){
+  const s=document.getElementById(id);
+  const cur=s.value;
+  s.innerHTML=`<option value="all">${lbl}</option>`;
+  vals.forEach(v=>{ const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o); });
+  if(cur&&cur!=='all') s.value=cur;
+}
+
+function aplicarFiltros(){
+  const ano=document.getElementById('fAno').value;
+  const ciclo=document.getElementById('fCiclo').value;
+  const bairro=document.getElementById('fBairro').value;
+  let d=[...S.raw];
+  if(ano!=='all')    d=d.filter(r=>String(r.Ano)===String(ano));
+  if(ciclo!=='all')  d=d.filter(r=>String(r.Ciclo)===String(ciclo));
+  if(bairro!=='all') d=d.filter(r=>r.Bairro===bairro);
+  S.fil=d;
+  const sa=document.querySelector('.sec.active');
+  if(sa) renderSec(sa.id.replace('sec-',''));
+}
+
+/* ══════════════════════════════════════════════════
+   INDICADORES
+══════════════════════════════════════════════════ */
+function calc(d){
+  const obs=r=>(r.Observacao||'').trim().toUpperCase();
+  const inst=d.length;
+  const pos=d.filter(r=>Number(r.N_Ovos)>0&&!['F','E','R','D'].includes(obs(r).charAt(0))).length;
+  const ovos=d.reduce((s,r)=>s+Number(r.N_Ovos||0),0);
+  const IPO=inst>0?(pos/inst)*100:0;
+  const IDO=pos>0?ovos/pos:0;
+  const f=d.filter(r=>obs(r)==='F').length;
+  const e=d.filter(r=>obs(r)==='E').length;
+  const r=d.filter(r=>obs(r)==='R').length;
+  const dd=d.filter(r=>obs(r)==='D').length;
+  const rec=d.filter(r=>obs(r)==='REC').length;
+  return{inst,pos,ovos,IPO,IDO,f,e,r,d:dd,rec,pend:f+e};
+}
+
+function nivelIPO(v){
+  if(v<25)  return{lbl:'🟢 Baixo',     c:'#2EC4B6'};
+  if(v<50)  return{lbl:'🟡 Médio',     c:'#F9C74F'};
+  if(v<75)  return{lbl:'🟠 Alto',      c:'#F4A261'};
+  return         {lbl:'🔴 Muito Alto', c:'#E63946'};
+}
+function nivelIDO(v){
+  if(v<50)  return{lbl:'🟢 Baixo',     c:'#2EC4B6'};
+  if(v<150) return{lbl:'🟡 Médio',     c:'#F9C74F'};
+  if(v<300) return{lbl:'🟠 Alto',      c:'#F4A261'};
+  return         {lbl:'🔴 Muito Alto', c:'#E63946'};
+}
+
+/* ══════════════════════════════════════════════════
+   RENDER OVERVIEW
+══════════════════════════════════════════════════ */
+function renderOverview(d){
+  document.getElementById('emptyOverview').classList.add('hidden');
+  document.getElementById('dashContent').classList.remove('hidden');
+
+  const i=calc(d);
+  txt('vIns', i.inst.toLocaleString('pt-BR'));
+  txt('vPos', i.pos.toLocaleString('pt-BR'));
+  txt('vIPO', i.IPO.toFixed(2)+'%');
+  txt('vIDO', i.IDO.toFixed(2));
+  txt('vOvos',i.ovos.toLocaleString('pt-BR'));
+  txt('vPend',i.pend.toLocaleString('pt-BR'));
+  txt('vRec', i.rec.toLocaleString('pt-BR'));
+  txt('vOut', (i.r+i.d).toLocaleString('pt-BR'));
+
+  const nI=nivelIPO(i.IPO), nD=nivelIDO(i.IDO);
+  setSub('sIPO',nI); setSub('sIDO',nD);
+
+  chEvolucao(d); chOvosCiclo(d); chIPOBairro(d); chStatus(i); chAgente(d);
+}
+
+function setSub(id,n){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=n.lbl;
+  el.style.background=n.c+'22';
+  el.style.color=n.c;
+}
+
+/* ══════════════════════════════════════════════════
+   RENDER OVITRAMPA
+══════════════════════════════════════════════════ */
+function renderOvitrampa(d){
+  preencherTabela('tOvt',d.slice(0,300),['ID_Ovitrampa','Bairro','Ciclo','Agente_Matricula','Data_Coleta','N_Ovos','Observacao']);
+  const inp=document.getElementById('buscaOvt');
+  inp.oninput=()=>filtrarOvt(d,inp.value.trim());
+}
+
+function filtrarOvt(d,q){
+  const f=q?d.filter(r=>String(r.ID_Ovitrampa||'').toLowerCase().includes(q.toLowerCase())):d;
+  preencherTabela('tOvt',f.slice(0,200),['ID_Ovitrampa','Bairro','Ciclo','Agente_Matricula','Data_Coleta','N_Ovos','Observacao']);
+  chOvtHistorico(f,q);
+  infoOvt(f,q);
+}
+
+function infoOvt(d,id){
+  const box=document.getElementById('infoOvt');
+  if(!d.length){box.innerHTML='<p>Nenhum resultado.</p>';return;}
+  const i=calc(d);
+  box.innerHTML=`
+    <div class="info-row"><span>ID Ovitrampa</span><strong>${id||'—'}</strong></div>
+    <div class="info-row"><span>Bairro</span><strong>${d[0].Bairro||'—'}</strong></div>
+    <div class="info-row"><span>Registros</span><strong>${d.length}</strong></div>
+    <div class="info-row"><span>Total Ovos</span><strong>${i.ovos.toLocaleString('pt-BR')}</strong></div>
+    <div class="info-row"><span>IPO</span><strong style="color:${nivelIPO(i.IPO).c}">${i.IPO.toFixed(2)}%</strong></div>
+    <div class="info-row"><span>IDO</span><strong>${i.IDO.toFixed(2)}</strong></div>
+    <div class="info-row"><span>Nível</span><strong style="color:${nivelIPO(i.IPO).c}">${nivelIPO(i.IPO).lbl}</strong></div>
+  `;
+}
+
+/* ══════════════════════════════════════════════════
+   RENDER BAIRRO
+══════════════════════════════════════════════════ */
+function renderBairro(d){
+  const bairros=[...new Set(d.map(r=>r.Bairro))].filter(Boolean).sort();
+  const ipos=bairros.map(b=>calc(d.filter(r=>r.Bairro===b)).IPO);
+  const idos=bairros.map(b=>calc(d.filter(r=>r.Bairro===b)).IDO);
+  const ovos=bairros.map(b=>calc(d.filter(r=>r.Bairro===b)).ovos);
+
+  chBarH('chBIPO',bairros,ipos,'IPO (%)','#0077B6');
+  chBarH('chBIDO',bairros,idos,'IDO','#F4A261');
+  chBar('chBOv',bairros,ovos,'Ovos','#7B2D8B');
+
+  const rank=bairros.map((b,i)=>({b,v:ipos[i]})).sort((a,b)=>b.v-a.v);
+  const mx=rank[0]?.v||1;
+  document.getElementById('rankB').innerHTML=rank.map((r,i)=>{
+    const n=nivelIPO(r.v);
+    return`<div class="rank-item">
+      <span class="rank-pos">${i+1}</span>
+      <span class="rank-lbl">${r.b}</span>
+      <div class="rank-bw"><div class="rank-b" style="width:${(r.v/mx)*100}%;background:${n.c}"></div></div>
+      <span class="rank-v">${r.v.toFixed(1)}%</span>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════
+   RENDER CICLO
+══════════════════════════════════════════════════ */
+function renderCiclo(d){
+  const ciclos=[...new Set(d.map(r=>r.Ciclo))].sort((a,b)=>Number(a)-Number(b));
+  const cc=document.getElementById('cardsCiclo');
+  cc.innerHTML=ciclos.map(c=>{
+    const i=calc(d.filter(r=>r.Ciclo==c));
+    const n=nivelIPO(i.IPO);
+    return`<div class="card" style="border-left-color:${n.c}">
+      <div class="c-icon" style="background:${n.c}22;color:${n.c}"><i class="fas fa-sync-alt"></i></div>
+      <div class="c-info">
+        <span class="c-lbl">Ciclo ${c}</span>
+        <span class="c-val" style="color:${n.c}">${i.IPO.toFixed(1)}%</span>
+        <span class="c-sub" style="background:${n.c}22;color:${n.c}">${i.inst} OVTs · ${i.ovos.toLocaleString('pt-BR')} ovos</span>
+      </div></div>`;
+  }).join('');
+
+  const tbody=document.querySelector('#tCiclo tbody');
+  tbody.innerHTML=ciclos.map(c=>{
+    const i=calc(d.filter(r=>r.Ciclo==c));
+    const n=nivelIPO(i.IPO);
+    return`<tr>
+      <td><strong>Ciclo ${c}</strong></td>
+      <td>${d.find(r=>r.Ciclo==c)?.Ano||'—'}</td>
+      <td>${i.inst}</td><td>${i.pos}</td>
+      <td><span style="color:${n.c};font-weight:800">${i.IPO.toFixed(2)}%</span></td>
+      <td>${i.IDO.toFixed(2)}</td>
+      <td>${i.ovos.toLocaleString('pt-BR')}</td>
+      <td><span class="badge bf">${i.pend}</span></td>
+    </tr>`;
+  }).join('');
+
+  const ipos=ciclos.map(c=>calc(d.filter(r=>r.Ciclo==c)).IPO);
+  const idos=ciclos.map(c=>calc(d.filter(r=>r.Ciclo==c)).IDO);
+  chDualLine('chCC',ciclos.map(c=>'C'+c),ipos,idos);
+
+  const i=calc(d);
+  chDoughnut('chCSt',
+    ['Positivas','Fechadas','Extraviadas','Recusadas','Desocupadas','Recuperadas'],
+    [i.pos,i.f,i.e,i.r,i.d,i.rec],
+    ['#2EC4B6','#E63946','#F4A261','#6C757D','#0077B6','#7B2D8B']);
+}
+
+/* ══════════════════════════════════════════════════
+   RENDER AGENTE
+══════════════════════════════════════════════════ */
+function renderAgente(d){
+  const ags=[...new Set(d.map(r=>r.Agente_Matricula))].filter(Boolean).sort();
+  const tbody=document.querySelector('#tAg tbody');
+  tbody.innerHTML=ags.map(a=>{
+    const dd=d.filter(r=>r.Agente_Matricula===a);
+    const i=calc(dd);
+    const n=nivelIPO(i.IPO);
+    const bs=[...new Set(dd.map(r=>r.Bairro))].join(', ');
+    return`<tr>
+      <td><strong>${a}</strong></td><td>${bs}</td>
+      <td>${i.inst}</td><td>${i.pos}</td>
+      <td>${i.ovos.toLocaleString('pt-BR')}</td>
+      <td><span style="color:${n.c};font-weight:800">${i.IPO.toFixed(2)}%</span></td>
+      <td>${i.IDO.toFixed(2)}</td>
+    </tr>`;
+  }).join('');
+
+  const ovos=ags.map(a=>d.filter(r=>r.Agente_Matricula===a).reduce((s,r)=>s+Number(r.N_Ovos||0),0));
+  chBarH('chAgO',ags,ovos,'Ovos','#7B2D8B');
+
+  const rank=ags.map((a,i)=>({a,v:ovos[i]})).sort((a,b)=>b.v-a.v);
+  const mx=rank[0]?.v||1;
+  document.getElementById('rankAg').innerHTML=rank.slice(0,15).map((r,i)=>
+    `<div class="rank-item">
+      <span class="rank-pos">${i+1}</span>
+      <span class="rank-lbl">${r.a}</span>
+      <div class="rank-bw"><div class="rank-b" style="width:${(r.v/mx)*100}%;background:#7B2D8B"></div></div>
+      <span class="rank-v">${r.v.toLocaleString('pt-BR')}</span>
+    </div>`
+  ).join('');
+
+  const inp=document.getElementById('buscaAg');
+  inp.oninput=()=>{
+    const t=inp.value.toLowerCase();
+    document.querySelectorAll('#tAg tbody tr').forEach(tr=>{
+      tr.style.display=tr.textContent.toLowerCase().includes(t)?'':'none';
+    });
+  };
+}
+
+/* ══════════════════════════════════════════════════
+   RENDER PENDÊNCIAS
+══════════════════════════════════════════════════ */
+function renderPendencias(d){
+  const i=calc(d);
+  txt('pF',i.f); txt('pE',i.e); txt('pR',i.r); txt('pD',i.d); txt('pRec',i.rec);
+
+  chDoughnut('chPT',['Fechadas','Extraviadas','Recusadas','Desocupadas','Recuperadas'],
+    [i.f,i.e,i.r,i.d,i.rec],['#E63946','#F4A261','#6C757D','#0077B6','#2EC4B6']);
+
+  const bairros=[...new Set(d.map(r=>r.Bairro))].filter(Boolean).sort();
+  const pb=bairros.map(b=>d.filter(r=>r.Bairro===b&&['F','E'].includes((r.Observacao||'').trim().toUpperCase())).length);
+  chBar('chPB',bairros,pb,'Pendências','#E63946');
+
+  const ciclos=[...new Set(d.map(r=>r.Ciclo))].sort((a,b)=>Number(a)-Number(b));
+  const pc=ciclos.map(c=>d.filter(r=>r.Ciclo==c&&['F','E'].includes((r.Observacao||'').trim().toUpperCase())).length);
+  chBar('chPC',ciclos.map(c=>'C'+c),pc,'Pendências','#F4A261');
+
+  renderTabelaPend(d,'all');
+  document.getElementById('fPend').onchange=function(){ renderTabelaPend(d,this.value); };
+}
+
+function renderTabelaPend(d,tipo){
+  const obs=r=>(r.Observacao||'').trim().toUpperCase();
+  let f=d.filter(r=>obs(r)!=='');
+  if(tipo!=='all') f=f.filter(r=>obs(r)===tipo);
+  preencherTabela('tPend',f.slice(0,300),['ID_Ovitrampa','Bairro','Ciclo','Agente_Matricula','Data_Coleta','Observacao']);
+}
+
+/* ══════════════════════════════════════════════════
+   TABELA GENÉRICA
+══════════════════════════════════════════════════ */
+function preencherTabela(id,d,cols){
+  const tbody=document.querySelector(`#${id} tbody`);
+  if(!tbody)return;
+  tbody.innerHTML=d.map(r=>`<tr>${cols.map(c=>{
+    if(c==='Observacao') return`<td>${badgeObs(r[c])}</td>`;
+    if(c==='N_Ovos')     return`<td><strong>${Number(r[c])||0}</strong></td>`;
+    if(c==='Data_Coleta')return`<td>${fmtData(r[c])}</td>`;
+    return`<td>${r[c]||'—'}</td>`;
+  }).join('')}</tr>`).join('');
+}
+
+function badgeObs(o){
+  const v=(o||'').trim().toUpperCase();
+  const m={F:['bf','Fechada'],E:['be','Extraviada'],R:['br','Recusada'],D:['bd','Desocupada'],REC:['brec','Recuperada']};
+  if(!v||!m[v]) return'<span class="badge bok">Normal</span>';
+  return`<span class="badge ${m[v][0]}">${m[v][1]}</span>`;
+}
+
+function fmtData(v){
+  if(!v)return'—';
+  if(v instanceof Date)return v.toLocaleDateString('pt-BR');
+  const d=new Date(v);
+  return isNaN(d)?String(v):d.toLocaleDateString('pt-BR');
+}
+
+/* ══════════════════════════════════════════════════
+   GRÁFICOS
+══════════════════════════════════════════════════ */
+const CORES=['#0D2B6E','#1A4BA0','#00B4D8','#2EC4B6','#F4A261','#E63946','#7B2D8B','#0077B6','#F9C74F','#90BE6D','#577590','#F3722C'];
+
+function getCtx(id){
+  if(_ch[id]){_ch[id].destroy();delete _ch[id];}
+  const c=document.getElementById(id);
+  return c?c.getContext('2d'):null;
+}
+
+function chEvolucao(d){
+  const ctx=getCtx('chEv');if(!ctx)return;
+  const ciclos=[...new Set(d.map(r=>r.Ciclo))].sort((a,b)=>Number(a)-Number(b));
+  const ipos=ciclos.map(c=>calc(d.filter(r=>r.Ciclo==c)).IPO);
+  const idos=ciclos.map(c=>calc(d.filter(r=>r.Ciclo==c)).IDO);
+  _ch['chEv']=new Chart(ctx,{
+    data:{labels:ciclos.map(c=>'Ciclo '+c),datasets:[
+      {type:'line',label:'IPO (%)',data:ipos,borderColor:'#2EC4B6',backgroundColor:'rgba(46,196,182,.1)',yAxisID:'yI',tension:.4,borderWidth:2.5,pointRadius:5,fill:true},
+      {type:'bar', label:'IDO',   data:idos,backgroundColor:'rgba(13,43,110,.6)',yAxisID:'yD',borderRadius:5}
+    ]},
+    options:{responsive:true,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'top'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+Number(c.raw).toFixed(2)+(c.dataset.yAxisID==='yI'?'%':'')}}},
+      scales:{
+        yI:{type:'linear',position:'left', title:{display:true,text:'IPO (%)'},min:0,max:100},
+        yD:{type:'linear',position:'right',title:{display:true,text:'IDO'},grid:{drawOnChartArea:false},min:0}
+      }
+    }
+  });
+}
+
+function chOvosCiclo(d){
+  const ctx=getCtx('chOC');if(!ctx)return;
+  const ciclos=[...new Set(d.map(r=>r.Ciclo))].sort((a,b)=>Number(a)-Number(b));
+  const ovos=ciclos.map(c=>d.filter(r=>r.Ciclo==c).reduce((s,r)=>s+Number(r.N_Ovos||0),0));
+  _ch['chOC']=new Chart(ctx,{type:'bar',data:{labels:ciclos.map(c=>'C'+c),datasets:[{label:'Ovos',data:ovos,backgroundColor:CORES,borderRadius:5}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+}
+
+function chIPOBairro(d){
+  const ctx=getCtx('chIB');if(!ctx)return;
+  const b=[...new Set(d.map(r=>r.Bairro))].filter(Boolean).sort();
+  const v=b.map(x=>calc(d.filter(r=>r.Bairro===x)).IPO);
+  _ch['chIB']=new Chart(ctx,{type:'bar',data:{labels:b,datasets:[{label:'IPO (%)',data:v,backgroundColor:v.map(x=>nivelIPO(x).c+'CC'),borderRadius:4}]},
+    options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:100}}}});
+}
+
+function chStatus(i){
+  const ctx=getCtx('chSt');if(!ctx)return;
+  const norm=i.inst-i.f-i.e-i.r-i.d;
+  _ch['chSt']=new Chart(ctx,{type:'doughnut',
+    data:{labels:['Normais','Fechadas','Extraviadas','Recusadas','Desocupadas','Recuperadas'],
+      datasets:[{data:[norm,i.f,i.e,i.r,i.d,i.rec],
+        backgroundColor:['#2EC4B6','#E63946','#F4A261','#6C757D','#0077B6','#7B2D8B'],
+        hoverOffset:8,borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
+}
+
+function chAgente(d){
+  const ctx=getCtx('chAg');if(!ctx)return;
+  const ags=[...new Set(d.map(r=>r.Agente_Matricula))].filter(Boolean).sort();
+  const ovos=ags.map(a=>d.filter(r=>r.Agente_Matricula===a).reduce((s,r)=>s+Number(r.N_Ovos||0),0));
+  _ch['chAg']=new Chart(ctx,{type:'bar',data:{labels:ags,datasets:[{label:'Ovos',data:ovos,backgroundColor:'#7B2D8B99',borderRadius:4}]},
+    options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
+}
+
+function chOvtHistorico(d,id){
+  const ctx=getCtx('chOvtC');if(!ctx)return;
+  const ciclos=[...new Set(d.map(r=>r.Ciclo))].sort((a,b)=>Number(a)-Number(b));
+  const ovos=ciclos.map(c=>d.filter(r=>r.Ciclo==c).reduce((s,r)=>s+Number(r.N_Ovos||0),0));
+  _ch['chOvtC']=new Chart(ctx,{type:'line',data:{labels:ciclos.map(c=>'C'+c),datasets:[{label:'Ovos — '+id,data:ovos,borderColor:'#0077B6',backgroundColor:'rgba(0,119,182,.08)',tension:.4,fill:true,pointRadius:6,borderWidth:2.5}]},
+    options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}});
+}
+
+function chBar(id,labels,data,label,color){
+  const ctx=getCtx(id);if(!ctx)return;
+  _ch[id]=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label,data,backgroundColor:color+'99',borderColor:color,borderWidth:1.5,borderRadius:5}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+}
+
+function chBarH(id,labels,data,label,color){
+  const ctx=getCtx(id);if(!ctx)return;
+  _ch[id]=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label,data,backgroundColor:color+'99',borderColor:color,borderWidth:1.5,borderRadius:5}]},
+    options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
+}
+
+function chDualLine(id,labels,d1,d2){
+  const ctx=getCtx(id);if(!ctx)return;
+  _ch[id]=new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'IPO (%)',data:d1,borderColor:'#2EC4B6',backgroundColor:'rgba(46,196,182,.08)',tension:.4,fill:true,borderWidth:2.5,pointRadius:5},
+    {label:'IDO',   data:d2,borderColor:'#F4A261', backgroundColor:'rgba(244,162,97,.08)', tension:.4,fill:true,borderWidth:2.5,pointRadius:5}
+  ]},options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}});
+}
+
+function chDoughnut(id,labels,data,colors){
+  const ctx=getCtx(id);if(!ctx)return;
+  _ch[id]=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:'#fff',hoverOffset:8}]},
+    options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
+}
+
+/* ══════════════════════════════════════════════════
+   MAPA
+══════════════════════════════════════════════════ */
+let mapInst=null, mapInit=false;
+const BAIRRO_COORDS={
+  'ALTO JOSE BONIFACIO':{lat:-8.0330,lng:-34.9620},'ALTO JOSE DO PINHO':{lat:-8.0280,lng:-34.9580},
+  'MACAXEIRA':{lat:-8.0220,lng:-34.9540},'NOVA DESCOBERTA':{lat:-8.0190,lng:-34.9610},
+  'VASCO DA GAMA':{lat:-8.0420,lng:-34.9650},'MANGABEIRA':{lat:-8.0500,lng:-34.9560},
+  'DOIS UNIDOS':{lat:-8.0150,lng:-34.9450},'AGUA FRIA':{lat:-8.0260,lng:-34.9500},
+  'BOMBA DO HEMETERIO':{lat:-8.0350,lng:-34.9500},'CAMPO GRANDE':{lat:-8.0430,lng:-34.9490},
+  'FUNDAO':{lat:-8.0100,lng:-34.9420},'LINHA DO TIRO':{lat:-8.0200,lng:-34.9440},
+  'PORTO DA MADEIRA':{lat:-8.0160,lng:-34.9380},'BEBERIBE':{lat:-8.0090,lng:-34.9370},
+};
+
+function initMapa(){
+  document.querySelector('[data-s="mapa"]').addEventListener('click',()=>{
+    setTimeout(()=>{ if(!mapInit){ criarMapa(); mapInit=true; } },200);
+  });
+}
+
+function criarMapa(){
+  mapInst=L.map('mapa').setView([-8.025,-34.950],13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap',maxZoom:19
+  }).addTo(mapInst);
+  if(S.fil.length) renderMapaData(S.fil);
+}
+
+function renderMapaData(d){
+  if(!mapInst){criarMapa();mapInit=true;return;}
+  mapInst.eachLayer(l=>{if(l instanceof L.CircleMarker)mapInst.removeLayer(l);});
+  const bairros=[...new Set(d.map(r=>(r.Bairro||'').toUpperCase().trim()))].filter(Boolean);
+  bairros.forEach(b=>{
+    const dd=d.filter(r=>(r.Bairro||'').toUpperCase().trim()===b);
+    const i=calc(dd);
+    const coords=BAIRRO_COORDS[b];
+    if(!coords)return;
+    const n=nivelIPO(i.IPO);
+    const raio=Math.min(18+i.inst*1.5,55);
+    L.circleMarker([coords.lat,coords.lng],{radius:raio,fillColor:n.c,color:'#fff',weight:2,opacity:1,fillOpacity:.75})
+    .bindPopup(`<div style="font-family:Segoe UI,sans-serif;min-width:170px">
+      <h4 style="margin:0 0 8px;color:#0D2B6E;font-size:.88rem">${b}</h4>
+      <table style="width:100%;font-size:.78rem;border-collapse:collapse">
+        <tr><td>Ovitrampas</td><td><b>${i.inst}</b></td></tr>
+        <tr><td>Positivas</td><td><b>${i.pos}</b></td></tr>
+        <tr><td>Total Ovos</td><td><b>${i.ovos.toLocaleString('pt-BR')}</b></td></tr>
+        <tr><td>IPO</td><td><b style="color:${n.c}">${i.IPO.toFixed(2)}%</b></td></tr>
+        <tr><td>IDO</td><td><b>${i.IDO.toFixed(2)}</b></td></tr>
+        <tr><td>Nível</td><td><b style="color:${n.c}">${n.lbl}</b></td></tr>
+      </table></div>`)
+    .addTo(mapInst);
+  });
+  setTimeout(()=>mapInst.invalidateSize(),200);
+}
+
+/* ══════════════════════════════════════════════════
+   UPLOAD EXCEL
+══════════════════════════════════════════════════ */
+const COL_MAP={
+  'ano':'Ano','ciclo':'Ciclo','ciclos':'Ciclo','ds':'Distrito_Sanitario',
+  'bairro':'Bairro','bairro_area':'Bairro_Area',
+  'agente / matrícula':'Agente_Matricula','agente/matricula':'Agente_Matricula',
+  'agente_matricula':'Agente_Matricula','qt':'Quantidade','quantidade':'Quantidade',
+  'id_ovt':'ID_Ovitrampa','id_ovitrampa':'ID_Ovitrampa',
+  'dt_coleta':'Data_Coleta','data_coleta':'Data_Coleta',
+  'dt_entrega_apoio':'Data_Entrega_Apoio','dt_entrega_lab':'Data_Entrega_Laboratorio',
+  'dt_leitura':'Data_Leitura','nm_tec_lab':'Tecnico_Laboratorio',
+  'dt_dig':'Data_Digitacao','dt_envio_ds':'Data_Envio_DS',
+  'n_ovos':'N_Ovos','numero_ovos':'N_Ovos',
+  'observação':'Observacao','observacao':'Observacao',
+  'distrito_sanitario':'Distrito_Sanitario','data_entrega_laboratorio':'Data_Entrega_Laboratorio',
+  'tecnico_laboratorio':'Tecnico_Laboratorio','data_digitacao':'Data_Digitacao',
+  'data_envio_ds':'Data_Envio_DS','data_leitura':'Data_Leitura','data_entrega_apoio':'Data_Entrega_Apoio',
+};
+
+let dadosPrev=[];
+
+function initUpload(){
+  const modal=document.getElementById('modalUp');
+  document.getElementById('btnUp').onclick=()=>{modal.classList.add('active');resetModal();};
+  document.getElementById('mClose').onclick=()=>modal.classList.remove('active');
+  document.getElementById('mCan').onclick=()=>modal.classList.remove('active');
+  modal.onclick=e=>{if(e.target===modal)modal.classList.remove('active');};
+
+  document.getElementById('fileIn').onchange=e=>{
+    if(e.target.files[0])processFile(e.target.files[0]);
+  };
+
+  const dz=document.getElementById('dropZ');
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dov');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('dov'));
+  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dov');if(e.dataTransfer.files[0])processFile(e.dataTransfer.files[0]);});
+
+  document.getElementById('mOk').onclick=()=>{
+    if(!dadosPrev.length)return;
+    let final;
+    if(S.raw.length){
+      const novCiclos=[...new Set(dadosPrev.map(r=>r.Ciclo+'_'+r.Ano))];
+      const base=S.raw.filter(r=>!novCiclos.includes(r.Ciclo+'_'+r.Ano));
+      final=[...base,...dadosPrev];
+      toast(`✅ Merge: ${dadosPrev.length} novos registros adicionados!`,'ok');
+    }else{
+      final=dadosPrev;
+      toast(`✅ ${final.length} registros importados com sucesso!`,'ok');
+    }
+    processarDados(final);
+    salvarLocal(final);
+    modal.classList.remove('active');
+  };
+}
+
+function processFile(file){
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(ws,{defval:''});
+      dadosPrev=normCols(raw);
+      mostrarPreview(file.name,dadosPrev);
+      document.getElementById('mOk').disabled=false;
+    }catch(err){toast('❌ Erro: '+err.message,'err');}
+  };
+  r.readAsArrayBuffer(file);
+}
+
+function normCols(raw){
+  if(!raw.length)return[];
+  const mapa={};
+  Object.keys(raw[0]).forEach(col=>{
+    const k=col.toLowerCase().trim();
+    mapa[col]=COL_MAP[k]||col;
+  });
+  return raw.map(row=>{
+    const n={};
+    Object.entries(row).forEach(([k,v])=>{n[mapa[k]||k]=v;});
+    return n;
+  });
+}
+
+function mostrarPreview(nome,d){
+  document.getElementById('prevWrap').classList.remove('hidden');
+  document.getElementById('prevNome').textContent=nome;
+  document.getElementById('prevQtd').textContent=d.length+' registros encontrados';
+  const cols=Object.keys(d[0]||{}).slice(0,7);
+  const tbl=document.getElementById('tPrev');
+  tbl.innerHTML=`<thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+  <tbody>${d.slice(0,6).map(r=>`<tr>${cols.map(c=>`<td>${r[c]??''}</td>`).join('')}</tr>`).join('')}</tbody>`;
+}
+
+function resetModal(){
+  dadosPrev=[];
+  document.getElementById('prevWrap').classList.add('hidden');
+  document.getElementById('mOk').disabled=true;
+  document.getElementById('fileIn').value='';
+}
+
+/* ══════════════════════════════════════════════════
+   PERSISTÊNCIA
+══════════════════════════════════════════════════ */
+function carregarLocal(){
+  try{
+    const raw=localStorage.getItem('ovt_ds7');
+    if(raw){const d=JSON.parse(raw);processarDados(d);toast(`📂 ${d.length} registros carregados.`,'ok');}
+  }catch(e){}
+}
+function salvarLocal(d){
+  try{localStorage.setItem('ovt_ds7',JSON.stringify(d));}catch(e){}
+}
+function processarDados(d){
+  S.raw=d; S.fil=[...d];
+  popularFiltros(d);
+  renderOverview(d);
+  const sa=document.querySelector('.sec.active');
+  if(sa){const id=sa.id.replace('sec-','');if(id!=='overview')renderSec(id);}
+}
+
+/* ══════════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════════ */
+function txt(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function toast(msg,tipo=''){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.className='toast show '+(tipo||'');
+  setTimeout(()=>{t.className='toast';},3800);
+}
+</script>
+</body>
+</html>
