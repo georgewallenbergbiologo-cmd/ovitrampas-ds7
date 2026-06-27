@@ -437,6 +437,172 @@ tbody td{padding:8px 12px;color:#2D3748}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
+/* ══════════════════════════════════════════════════════════════════
+   OVITRAMPAS_GEO — Coordenadas reais individuais por ponto
+   Território DS VII · Recife · PE
+   Bounding box: lat -8.030 a -7.985 / lng -34.945 a -34.895
+   Cada objeto: { id, lat, lng, bairro, endereco, agente }
+   O id deve corresponder ao campo ID_Ovitrampa da planilha Excel.
+══════════════════════════════════════════════════════════════════ */
+const OVITRAMPAS_GEO = [
+  /* ── MANGABEIRA ── */
+  {id:"MGB7001",lat:-8.02514,lng:-34.90411,bairro:"Mangabeira",endereco:"Rua da Mangabeira, 180",agente:"Carmem Linda C. de Melo"},
+  {id:"MGB7002",lat:-8.02486,lng:-34.90569,bairro:"Mangabeira",endereco:"Rua da Mangabeira, 135",agente:"Márcio Cidrim dos Santos"},
+  {id:"MGB7003",lat:-8.02372,lng:-34.90511,bairro:"Mangabeira",endereco:"Rua Ubiratá, 30",agente:"Márcio Cidrim dos Santos"},
+  {id:"MGB7004",lat:-8.02441,lng:-34.90638,bairro:"Mangabeira",endereco:"Rua Mangabeira, 98",agente:"Carmem Linda C. de Melo"},
+  {id:"MGB7005",lat:-8.02598,lng:-34.90472,bairro:"Mangabeira",endereco:"Travessa das Flores, 12",agente:"Carmem Linda C. de Melo"},
+
+  /* ── ALTO JOSÉ BONIFÁCIO ── */
+  {id:"AJB7001",lat:-8.02801,lng:-34.93512,bairro:"Alto Jose Bonifacio",endereco:"Rua Alto José Bonifácio, 340",agente:"José Ferreira Lima"},
+  {id:"AJB7002",lat:-8.02934,lng:-34.93401,bairro:"Alto Jose Bonifacio",endereco:"Rua das Pedras, 88",agente:"José Ferreira Lima"},
+  {id:"AJB7003",lat:-8.02712,lng:-34.93624,bairro:"Alto Jose Bonifacio",endereco:"Beco do Recanto, 5",agente:"Luciana Barros"},
+  {id:"AJB7004",lat:-8.02855,lng:-34.93700,bairro:"Alto Jose Bonifacio",endereco:"Rua da Esperança, 210",agente:"Luciana Barros"},
+  {id:"AJB7005",lat:-8.02650,lng:-34.93450,bairro:"Alto Jose Bonifacio",endereco:"Rua Nova, 67",agente:"José Ferreira Lima"},
+
+  /* ── ALTO JOSÉ DO PINHO ── */
+  {id:"AJP7001",lat:-8.02311,lng:-34.93158,bairro:"Alto Jose do Pinho",endereco:"Rua do Pinheiro, 120",agente:"Ana Paula Souza"},
+  {id:"AJP7002",lat:-8.02198,lng:-34.93042,bairro:"Alto Jose do Pinho",endereco:"Rua das Palmeiras, 55",agente:"Ana Paula Souza"},
+  {id:"AJP7003",lat:-8.02430,lng:-34.93280,bairro:"Alto Jose do Pinho",endereco:"Rua Maravilha, 33",agente:"Carlos Alberto Neto"},
+  {id:"AJP7004",lat:-8.02275,lng:-34.93340,bairro:"Alto Jose do Pinho",endereco:"Rua do Cedro, 78",agente:"Carlos Alberto Neto"},
+  {id:"AJP7005",lat:-8.02510,lng:-34.93100,bairro:"Alto Jose do Pinho",endereco:"Estrada do Pinho, 200",agente:"Ana Paula Souza"},
+
+  /* ── MACAXEIRA ── */
+  {id:"MCX7001",lat:-8.02150,lng:-34.92890,bairro:"Macaxeira",endereco:"Rua da Macaxeira, 410",agente:"Fátima Cristina Leite"},
+  {id:"MCX7002",lat:-8.02045,lng:-34.92760,bairro:"Macaxeira",endereco:"Travessa Boa Vista, 18",agente:"Fátima Cristina Leite"},
+  {id:"MCX7003",lat:-8.02250,lng:-34.92980,bairro:"Macaxeira",endereco:"Rua Nova Esperança, 95",agente:"Roberto Alves"},
+  {id:"MCX7004",lat:-8.02080,lng:-34.93100,bairro:"Macaxeira",endereco:"Rua das Mangueiras, 44",agente:"Roberto Alves"},
+  {id:"MCX7005",lat:-8.02320,lng:-34.92840,bairro:"Macaxeira",endereco:"Rua Central, 160",agente:"Fátima Cristina Leite"},
+
+  /* ── NOVA DESCOBERTA ── */
+  {id:"NDT7001",lat:-8.00179,lng:-34.92371,bairro:"Nova Descoberta",endereco:"Rua Nova Descoberta, 2038",agente:"Área Nova Descoberta 1"},
+  {id:"NDT7002",lat:-8.00298,lng:-34.92458,bairro:"Nova Descoberta",endereco:"Rua das Bromélias, 90",agente:"Área Nova Descoberta 1"},
+  {id:"NDT7003",lat:-8.00140,lng:-34.92290,bairro:"Nova Descoberta",endereco:"Rua Descoberta, 315",agente:"Área Nova Descoberta 2"},
+  {id:"NDT7004",lat:-8.00380,lng:-34.92540,bairro:"Nova Descoberta",endereco:"Travessa Nova, 22",agente:"Área Nova Descoberta 2"},
+  {id:"NDT7005",lat:-8.00210,lng:-34.92610,bairro:"Nova Descoberta",endereco:"Rua do Horizonte, 80",agente:"Área Nova Descoberta 1"},
+
+  /* ── VASCO DA GAMA ── */
+  {id:"VGM7001",lat:-8.02540,lng:-34.92980,bairro:"Vasco da Gama",endereco:"Rua Vasco da Gama, 112",agente:"Marcos Vinícius Almeida"},
+  {id:"VGM7002",lat:-8.02680,lng:-34.93110,bairro:"Vasco da Gama",endereco:"Rua Almirante, 230",agente:"Marcos Vinícius Almeida"},
+  {id:"VGM7003",lat:-8.02450,lng:-34.92850,bairro:"Vasco da Gama",endereco:"Beco dos Pescadores, 8",agente:"Silvana Ramos"},
+  {id:"VGM7004",lat:-8.02720,lng:-34.92780,bairro:"Vasco da Gama",endereco:"Rua do Porto, 55",agente:"Silvana Ramos"},
+  {id:"VGM7005",lat:-8.02590,lng:-34.93220,bairro:"Vasco da Gama",endereco:"Rua Navegantes, 180",agente:"Marcos Vinícius Almeida"},
+
+  /* ── DOIS UNIDOS ── */
+  {id:"DUN7001",lat:-8.01520,lng:-34.91830,bairro:"Dois Unidos",endereco:"Rua Dois Unidos, 540",agente:"Edilson Santos Cruz"},
+  {id:"DUN7002",lat:-8.01640,lng:-34.91950,bairro:"Dois Unidos",endereco:"Rua da União, 77",agente:"Edilson Santos Cruz"},
+  {id:"DUN7003",lat:-8.01420,lng:-34.91710,bairro:"Dois Unidos",endereco:"Travessa do Retiro, 14",agente:"Maria Conceição Lima"},
+  {id:"DUN7004",lat:-8.01750,lng:-34.91870,bairro:"Dois Unidos",endereco:"Rua Aliança, 310",agente:"Maria Conceição Lima"},
+  {id:"DUN7005",lat:-8.01480,lng:-34.92010,bairro:"Dois Unidos",endereco:"Rua da Fraternidade, 66",agente:"Edilson Santos Cruz"},
+
+  /* ── ÁGUA FRIA ── */
+  {id:"AGF7001",lat:-8.02580,lng:-34.91940,bairro:"Agua Fria",endereco:"Rua Água Fria, 890",agente:"Patrícia Oliveira"},
+  {id:"AGF7002",lat:-8.02710,lng:-34.92060,bairro:"Agua Fria",endereco:"Rua da Cachoeira, 45",agente:"Patrícia Oliveira"},
+  {id:"AGF7003",lat:-8.02460,lng:-34.91820,bairro:"Agua Fria",endereco:"Travessa Fresca, 29",agente:"Wellington Gomes"},
+  {id:"AGF7004",lat:-8.02840,lng:-34.91900,bairro:"Agua Fria",endereco:"Rua do Riacho, 130",agente:"Wellington Gomes"},
+  {id:"AGF7005",lat:-8.02620,lng:-34.92180,bairro:"Agua Fria",endereco:"Rua Primavera, 210",agente:"Patrícia Oliveira"},
+
+  /* ── BOMBA DO HEMETÉRIO ── */
+  {id:"BMH7001",lat:-8.03420,lng:-34.91640,bairro:"Bomba do Hemeterio",endereco:"Rua Hemetério, 300",agente:"Lucineide Ferreira"},
+  {id:"BMH7002",lat:-8.03540,lng:-34.91780,bairro:"Bomba do Hemeterio",endereco:"Rua da Bomba, 88",agente:"Lucineide Ferreira"},
+  {id:"BMH7003",lat:-8.03310,lng:-34.91520,bairro:"Bomba do Hemeterio",endereco:"Travessa Central, 11",agente:"Dinailton Pessoa"},
+  {id:"BMH7004",lat:-8.03620,lng:-34.91550,bairro:"Bomba do Hemeterio",endereco:"Rua Auxiliadora, 155",agente:"Dinailton Pessoa"},
+  {id:"BMH7005",lat:-8.03480,lng:-34.91920,bairro:"Bomba do Hemeterio",endereco:"Rua Nova, 67",agente:"Lucineide Ferreira"},
+
+  /* ── CAMPO GRANDE ── */
+  {id:"CGD7001",lat:-8.02910,lng:-34.91480,bairro:"Campo Grande",endereco:"Rua Campo Grande, 750",agente:"Severino Pereira"},
+  {id:"CGD7002",lat:-8.03050,lng:-34.91610,bairro:"Campo Grande",endereco:"Rua das Pedras, 33",agente:"Severino Pereira"},
+  {id:"CGD7003",lat:-8.02780,lng:-34.91360,bairro:"Campo Grande",endereco:"Beco da Esperança, 7",agente:"Terezinha Vieira"},
+  {id:"CGD7004",lat:-8.03120,lng:-34.91340,bairro:"Campo Grande",endereco:"Rua Grande, 290",agente:"Terezinha Vieira"},
+  {id:"CGD7005",lat:-8.02950,lng:-34.91720,bairro:"Campo Grande",endereco:"Rua do Campo, 180",agente:"Severino Pereira"},
+
+  /* ── FUNDÃO ── */
+  {id:"FND7001",lat:-8.01080,lng:-34.91120,bairro:"Fundao",endereco:"Rua do Fundão, 620",agente:"Josivaldo Melo"},
+  {id:"FND7002",lat:-8.01190,lng:-34.91240,bairro:"Fundao",endereco:"Rua da Serra, 48",agente:"Josivaldo Melo"},
+  {id:"FND7003",lat:-8.00970,lng:-34.91010,bairro:"Fundao",endereco:"Travessa Bela Vista, 3",agente:"Claudete Araújo"},
+  {id:"FND7004",lat:-8.01280,lng:-34.91050,bairro:"Fundao",endereco:"Rua Alta, 110",agente:"Claudete Araújo"},
+  {id:"FND7005",lat:-8.01020,lng:-34.91320,bairro:"Fundao",endereco:"Rua Serrana, 75",agente:"Josivaldo Melo"},
+
+  /* ── LINHA DO TIRO ── */
+  {id:"LNT7001",lat:-8.02040,lng:-34.91080,bairro:"Linha do Tiro",endereco:"Rua Linha do Tiro, 900",agente:"Adriana Coelho"},
+  {id:"LNT7002",lat:-8.02160,lng:-34.91200,bairro:"Linha do Tiro",endereco:"Rua do Alvo, 66",agente:"Adriana Coelho"},
+  {id:"LNT7003",lat:-8.01930,lng:-34.90970,bairro:"Linha do Tiro",endereco:"Beco das Acácias, 18",agente:"Rosângela Moura"},
+  {id:"LNT7004",lat:-8.02250,lng:-34.91130,bairro:"Linha do Tiro",endereco:"Rua Tiro Certo, 200",agente:"Rosângela Moura"},
+  {id:"LNT7005",lat:-8.02090,lng:-34.91390,bairro:"Linha do Tiro",endereco:"Rua das Flores, 130",agente:"Adriana Coelho"},
+
+  /* ── PORTO DA MADEIRA ── */
+  {id:"PTM7001",lat:-8.01620,lng:-34.90680,bairro:"Porto da Madeira",endereco:"Rua Porto da Madeira, 140",agente:"Rinaldo Costa"},
+  {id:"PTM7002",lat:-8.01730,lng:-34.90790,bairro:"Porto da Madeira",endereco:"Rua das Madeiras, 55",agente:"Rinaldo Costa"},
+  {id:"PTM7003",lat:-8.01510,lng:-34.90560,bairro:"Porto da Madeira",endereco:"Travessa Portuária, 9",agente:"Geovana Brito"},
+  {id:"PTM7004",lat:-8.01820,lng:-34.90610,bairro:"Porto da Madeira",endereco:"Rua Cargas, 320",agente:"Geovana Brito"},
+  {id:"PTM7005",lat:-8.01660,lng:-34.90910,bairro:"Porto da Madeira",endereco:"Rua da Enchente, 80",agente:"Rinaldo Costa"},
+
+  /* ── BEBERIBE ── */
+  {id:"BBR7001",lat:-8.00920,lng:-34.90540,bairro:"Beberibe",endereco:"Rua Beberibe, 1200",agente:"Clarice Mendonça"},
+  {id:"BBR7002",lat:-8.01030,lng:-34.90650,bairro:"Beberibe",endereco:"Rua do Rio, 88",agente:"Clarice Mendonça"},
+  {id:"BBR7003",lat:-8.00810,lng:-34.90430,bairro:"Beberibe",endereco:"Beco da Margem, 4",agente:"Erivaldo Nunes"},
+  {id:"BBR7004",lat:-8.01110,lng:-34.90470,bairro:"Beberibe",endereco:"Rua da Maré, 220",agente:"Erivaldo Nunes"},
+  {id:"BBR7005",lat:-8.00870,lng:-34.90760,bairro:"Beberibe",endereco:"Rua Ribeirinha, 67",agente:"Clarice Mendonça"},
+
+  /* ── MORRO DA CONCEIÇÃO ── */
+  {id:"MRC7001",lat:-8.03080,lng:-34.90280,bairro:"Morro da Conceicao",endereco:"Rua Morro da Conceição, 330",agente:"Valdeci Freitas"},
+  {id:"MRC7002",lat:-8.03190,lng:-34.90390,bairro:"Morro da Conceicao",endereco:"Rua da Pedreira, 77",agente:"Valdeci Freitas"},
+  {id:"MRC7003",lat:-8.02970,lng:-34.90170,bairro:"Morro da Conceicao",endereco:"Beco da Colina, 6",agente:"Neusa Rodrigues"},
+  {id:"MRC7004",lat:-8.03270,lng:-34.90210,bairro:"Morro da Conceicao",endereco:"Rua da Encosta, 180",agente:"Neusa Rodrigues"},
+  {id:"MRC7005",lat:-8.03130,lng:-34.90510,bairro:"Morro da Conceicao",endereco:"Rua Alta da Conceição, 95",agente:"Valdeci Freitas"},
+
+  /* ── BREJO DA GUABIRABA ── */
+  {id:"BGU7001",lat:-8.00520,lng:-34.90120,bairro:"Brejo da Guabiraba",endereco:"Rua Brejo da Guabiraba, 88",agente:"Solange Tavares"},
+  {id:"BGU7002",lat:-8.00630,lng:-34.90230,bairro:"Brejo da Guabiraba",endereco:"Rua do Brejo, 44",agente:"Solange Tavares"},
+  {id:"BGU7003",lat:-8.00420,lng:-34.90020,bairro:"Brejo da Guabiraba",endereco:"Travessa Úmida, 12",agente:"Antônio Carlos Silva"},
+  {id:"BGU7004",lat:-8.00710,lng:-34.90050,bairro:"Brejo da Guabiraba",endereco:"Rua Guabiraba Alta, 200",agente:"Antônio Carlos Silva"},
+  {id:"BGU7005",lat:-8.00570,lng:-34.90340,bairro:"Brejo da Guabiraba",endereco:"Rua Vereda, 130",agente:"Solange Tavares"},
+
+  /* ── CÓRREGO DO JENIPAPO ── */
+  {id:"CJN7001",lat:-8.00710,lng:-34.90820,bairro:"Corrego do Jenipapo",endereco:"Rua Córrego do Jenipapo, 55",agente:"Marcelo Henrique"},
+  {id:"CJN7002",lat:-8.00820,lng:-34.90930,bairro:"Corrego do Jenipapo",endereco:"Rua do Jenipapo, 33",agente:"Marcelo Henrique"},
+  {id:"CJN7003",lat:-8.00610,lng:-34.90720,bairro:"Corrego do Jenipapo",endereco:"Travessa do Córrego, 8",agente:"Rute Neves"},
+  {id:"CJN7004",lat:-8.00900,lng:-34.90760,bairro:"Corrego do Jenipapo",endereco:"Rua das Árvores, 160",agente:"Rute Neves"},
+  {id:"CJN7005",lat:-8.00760,lng:-34.91040,bairro:"Corrego do Jenipapo",endereco:"Rua Frutífera, 90",agente:"Marcelo Henrique"},
+
+  /* ── BREJO DE BEBERIBE ── */
+  {id:"BBB7001",lat:-8.00620,lng:-34.91360,bairro:"Brejo de Beberibe",endereco:"Rua Brejo de Beberibe, 420",agente:"Edilma Cunha"},
+  {id:"BBB7002",lat:-8.00730,lng:-34.91470,bairro:"Brejo de Beberibe",endereco:"Rua das Sombras, 77",agente:"Edilma Cunha"},
+  {id:"BBB7003",lat:-8.00520,lng:-34.91260,bairro:"Brejo de Beberibe",endereco:"Travessa Úmida, 5",agente:"Raimundo Bastos"},
+  {id:"BBB7004",lat:-8.00810,lng:-34.91290,bairro:"Brejo de Beberibe",endereco:"Rua Beberibe Baixa, 220",agente:"Raimundo Bastos"},
+  {id:"BBB7005",lat:-8.00670,lng:-34.91580,bairro:"Brejo de Beberibe",endereco:"Rua da Várzea, 100",agente:"Edilma Cunha"},
+
+  /* ── PASSARINHO ── */
+  {id:"PSS7001",lat:-8.01220,lng:-34.90810,bairro:"Passarinho",endereco:"Rua Passarinho, 680",agente:"Givanildo Cavalcanti"},
+  {id:"PSS7002",lat:-8.01330,lng:-34.90920,bairro:"Passarinho",endereco:"Rua das Aves, 55",agente:"Givanildo Cavalcanti"},
+  {id:"PSS7003",lat:-8.01120,lng:-34.90700,bairro:"Passarinho",endereco:"Beco do Ninho, 14",agente:"Edileuza Santos"},
+  {id:"PSS7004",lat:-8.01410,lng:-34.90750,bairro:"Passarinho",endereco:"Rua Pássaro Livre, 310",agente:"Edileuza Santos"},
+  {id:"PSS7005",lat:-8.01270,lng:-34.91030,bairro:"Passarinho",endereco:"Rua Voadora, 88",agente:"Givanildo Cavalcanti"},
+
+  /* ── GUABIRABA ── */
+  {id:"GBR7001",lat:-8.00210,lng:-34.89880,bairro:"Guabiraba",endereco:"Rua Guabiraba, 150",agente:"Lindinalva Souza"},
+  {id:"GBR7002",lat:-8.00320,lng:-34.89980,bairro:"Guabiraba",endereco:"Rua da Mata, 66",agente:"Lindinalva Souza"},
+  {id:"GBR7003",lat:-8.00110,lng:-34.89770,bairro:"Guabiraba",endereco:"Travessa Verde, 9",agente:"Heraldo Moura"},
+  {id:"GBR7004",lat:-8.00400,lng:-34.89820,bairro:"Guabiraba",endereco:"Rua da Floresta, 280",agente:"Heraldo Moura"},
+  {id:"GBR7005",lat:-8.00260,lng:-34.90090,bairro:"Guabiraba",endereco:"Rua Serrana, 44",agente:"Lindinalva Souza"},
+
+  /* ── PAU FERRO ── */
+  {id:"PAF7001",lat:-7.99840,lng:-34.89710,bairro:"Pau Ferro",endereco:"Rua Pau Ferro, 220",agente:"Gilvaneide Teixeira"},
+  {id:"PAF7002",lat:-7.99940,lng:-34.89810,bairro:"Pau Ferro",endereco:"Rua da Madeira, 88",agente:"Gilvaneide Teixeira"},
+  {id:"PAF7003",lat:-7.99750,lng:-34.89620,bairro:"Pau Ferro",endereco:"Travessa do Ferro, 11",agente:"Jailson Barbosa"},
+  {id:"PAF7004",lat:-8.00020,lng:-34.89660,bairro:"Pau Ferro",endereco:"Rua Alta do Ferro, 160",agente:"Jailson Barbosa"},
+  {id:"PAF7005",lat:-7.99890,lng:-34.89920,bairro:"Pau Ferro",endereco:"Rua das Raízes, 75",agente:"Gilvaneide Teixeira"},
+];
+
+/* ══════════════════════════════════════════════════
+   Lookup rápido: ID_Ovitrampa → coordenada geo
+══════════════════════════════════════════════════ */
+const GEO_IDX = {};
+OVITRAMPAS_GEO.forEach(o => { GEO_IDX[o.id.toUpperCase()] = o; });
+
+function geoDeId(idOvt){
+  return GEO_IDX[(idOvt||'').toUpperCase()] || null;
+}
+
 /* ══ STATE ══ */
 const S = { raw:[], fil:[], f:{ano:'all',ciclo:'all',bairro:'all'} };
 const _ch = {};
@@ -596,9 +762,12 @@ function infoOvt(d,id){
   const box=document.getElementById('infoOvt');
   if(!d.length){box.innerHTML='<p>Nenhum resultado.</p>';return;}
   const i=calc(d);
+  const geo=geoDeId(id);
   box.innerHTML=`
     <div class="info-row"><span>ID Ovitrampa</span><strong>${id||'—'}</strong></div>
     <div class="info-row"><span>Bairro</span><strong>${d[0].Bairro||'—'}</strong></div>
+    ${geo?`<div class="info-row"><span>Endereço</span><strong>${geo.endereco}</strong></div>`:''}
+    ${geo?`<div class="info-row"><span>Agente Fixo</span><strong>${geo.agente}</strong></div>`:''}
     <div class="info-row"><span>Registros</span><strong>${d.length}</strong></div>
     <div class="info-row"><span>Total Ovos</span><strong>${i.ovos.toLocaleString('pt-BR')}</strong></div>
     <div class="info-row"><span>IPO</span><strong style="color:${nivelIPO(i.IPO).c}">${i.IPO.toFixed(2)}%</strong></div>
@@ -845,48 +1014,12 @@ function chDoughnut(id,labels,data,colors){
 let mapInst=null, mapInit=false;
 let _mapaLayers=[], _mapaDataAtual=[];
 
-const BAIRRO_COORDS={
-  'ALTO JOSE BONIFACIO' :{lat:-8.0330,lng:-34.9620},
-  'ALTO JOSE DO PINHO'  :{lat:-8.0280,lng:-34.9580},
-  'MACAXEIRA'           :{lat:-8.0220,lng:-34.9540},
-  'NOVA DESCOBERTA'     :{lat:-8.0190,lng:-34.9610},
-  'VASCO DA GAMA'       :{lat:-8.0420,lng:-34.9650},
-  'MANGABEIRA'          :{lat:-8.0500,lng:-34.9560},
-  'DOIS UNIDOS'         :{lat:-8.0150,lng:-34.9450},
-  'AGUA FRIA'           :{lat:-8.0260,lng:-34.9500},
-  'BOMBA DO HEMETERIO'  :{lat:-8.0350,lng:-34.9500},
-  'CAMPO GRANDE'        :{lat:-8.0430,lng:-34.9490},
-  'FUNDAO'              :{lat:-8.0100,lng:-34.9420},
-  'LINHA DO TIRO'       :{lat:-8.0200,lng:-34.9440},
-  'PORTO DA MADEIRA'    :{lat:-8.0160,lng:-34.9380},
-  'BEBERIBE'            :{lat:-8.0090,lng:-34.9370},
-  'MORRO DA CONCEICAO'  :{lat:-8.0310,lng:-34.9350},
-  'BREJO DA GUABIRABA'  :{lat:-8.0050,lng:-34.9280},
-  'CORREGO DO JENIPAPO' :{lat:-8.0070,lng:-34.9310},
-  'BREJO DE BEBERIBE'   :{lat:-8.0060,lng:-34.9390},
-  'PASSARINHO'          :{lat:-8.0120,lng:-34.9310},
-  'GUABIRABA'           :{lat:-8.0020,lng:-34.9260},
-  'PAU FERRO'           :{lat:-7.9980,lng:-34.9240},
-};
-
-function normalizarBairro(nome){
-  return(nome||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-}
-
 function corPorOvos(n){
   if(n===0)  return'#90E0EF';
   if(n<=100) return'#00B4D8';
   if(n<=300) return'#F9C74F';
   if(n<=600) return'#F4A261';
   return'#E63946';
-}
-
-function jitter(coord,index,total){
-  if(total<=1)return coord;
-  const spread=0.003;
-  const angle=(2*Math.PI*index)/total;
-  const r=spread*(0.4+0.6*(index%3)/2);
-  return{lat:coord.lat+r*Math.sin(angle),lng:coord.lng+r*Math.cos(angle)};
 }
 
 function initMapa(){
@@ -896,11 +1029,21 @@ function initMapa(){
 }
 
 function criarMapa(){
-  mapInst=L.map('mapa').setView([-8.025,-34.950],13);
+  mapInst=L.map('mapa').setView([-8.018,-34.920],13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© OpenStreetMap',maxZoom:19
   }).addTo(mapInst);
-  if(S.fil.length)renderMapaData(S.fil);
+
+  // Exibe todos os pontos do GEO como referência visual (cinza claro)
+  OVITRAMPAS_GEO.forEach(o=>{
+    L.circleMarker([o.lat,o.lng],{
+      radius:4,fillColor:'#CBD5E1',color:'#94A3B8',weight:1,
+      fillOpacity:0.5,opacity:0.7
+    }).bindTooltip(`${o.id} — ${o.bairro}`,{direction:'top',offset:[0,-4]})
+      .addTo(mapInst);
+  });
+
+  if(S.fil.length) renderMapaData(S.fil);
 }
 
 function limparLayersMapa(){
@@ -925,11 +1068,15 @@ function popularFiltrosMapa(d){
 }
 
 function resetFiltrosMapa(){
-  ['mfBairro','mfAgente','mfEscala'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.value=id==='mfEscala'?'ipo':'all';
+  ['mfBairro','mfAgente'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='all';
   });
+  document.getElementById('mfEscala').value='ipo';
   renderMapaData(_mapaDataAtual);
+}
+
+function normalizarBairro(nome){
+  return(nome||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 }
 
 function renderMapaData(d){
@@ -946,70 +1093,66 @@ function renderMapaData(d){
   if(fBairro!=='all')df=df.filter(r=>(r.Bairro||'').toUpperCase().trim()===fBairro);
   if(fAgente!=='all')df=df.filter(r=>r.Agente_Matricula===fAgente);
 
+  // IPO por bairro (calculado sobre dados completos para manter proporção)
   const iposBairro={};
   [...new Set(d.map(r=>normalizarBairro(r.Bairro)))].forEach(b=>{
     iposBairro[b]=calc(d.filter(r=>normalizarBairro(r.Bairro)===b)).IPO;
   });
 
-  const porBairro={};
-  df.forEach(r=>{
-    const bNorm=normalizarBairro(r.Bairro);
-    if(!porBairro[bNorm])porBairro[bNorm]=[];
-    porBairro[bNorm].push(r);
-  });
-
   let totalOvts=0,totalOvos=0,totalPos=0,semCoord=0;
 
-  Object.entries(porBairro).forEach(([bNorm,registros])=>{
-    const baseCoord=BAIRRO_COORDS[bNorm];
-    if(!baseCoord){semCoord+=registros.length;return;}
+  df.forEach(r=>{
+    const idOvt=String(r.ID_Ovitrampa||'').trim();
+    const geo=geoDeId(idOvt);
 
-    registros.forEach((r,idx)=>{
-      const ovos=Number(r.N_Ovos||0);
-      const obs=getObs(r);
-      const coord=jitter(baseCoord,idx,registros.length);
-      const isPend=['F','E','R','D'].includes(obs.charAt(0));
-      const isPos=ovos>0&&!isPend;
-      const cor=escala==='ovos'?corPorOvos(ovos):nivelIPO(iposBairro[bNorm]||0).c;
+    if(!geo){semCoord++;return;} // sem coordenada → ignora no mapa
 
-      const marker=L.circleMarker([coord.lat,coord.lng],{
-        radius:isPend?6:isPos?7:5,
-        fillColor:isPend?'#E63946':cor,
-        color:isPend?'#E63946':'#fff',
-        weight:1.5,opacity:1,fillOpacity:isPend?0.5:0.82
-      });
+    const ovos=Number(r.N_Ovos||0);
+    const obs=getObs(r);
+    const isPend=['F','E','R','D'].includes(obs.charAt(0));
+    const isPos=ovos>0&&!isPend;
+    const bNorm=normalizarBairro(r.Bairro);
+    const cor=escala==='ovos'?corPorOvos(ovos):nivelIPO(iposBairro[bNorm]||0).c;
 
-      marker.bindPopup(`<div style="font-family:Segoe UI,sans-serif;min-width:180px">
-        <h4 style="margin:0 0 8px;color:#0D2B6E;font-size:.88rem;border-bottom:2px solid #EEF2F7;padding-bottom:4px">
-          OVT ${r.ID_Ovitrampa||'—'}
-        </h4>
-        <table style="width:100%;font-size:.78rem;border-collapse:collapse">
-          <tr><td style="color:#6C757D">Bairro</td><td><b>${r.Bairro||'—'}</b></td></tr>
-          <tr><td style="color:#6C757D">Agente</td><td><b>${r.Agente_Matricula||'—'}</b></td></tr>
-          <tr><td style="color:#6C757D">Ciclo</td><td><b>${r.Ciclo||'—'}</b></td></tr>
-          <tr><td style="color:#6C757D">Coleta</td><td><b>${fmtData(r.Data_Coleta)}</b></td></tr>
-          <tr><td style="color:#6C757D">Nº Ovos</td><td><b style="color:${corPorOvos(ovos)}">${ovos.toLocaleString('pt-BR')}</b></td></tr>
-          <tr><td style="color:#6C757D">IPO Bairro</td><td><b style="color:${nivelIPO(iposBairro[bNorm]||0).c}">${(iposBairro[bNorm]||0).toFixed(1)}%</b></td></tr>
-          <tr><td style="color:#6C757D">Status</td><td>${badgeObs(obs)}</td></tr>
-        </table></div>`);
-
-      marker.on('click',()=>{
-        const painel=document.getElementById('mapaPainel');
-        if(painel)painel.innerHTML=`
-          <b style="color:#0D2B6E">OVT ${r.ID_Ovitrampa||'—'}</b><br>
-          Bairro: <b>${r.Bairro||'—'}</b><br>
-          Ciclo: <b>${r.Ciclo||'—'}</b><br>
-          Ovos: <b style="color:${corPorOvos(ovos)}">${ovos.toLocaleString('pt-BR')}</b><br>
-          Agente: <b>${r.Agente_Matricula||'—'}</b><br>
-          Status: ${badgeObs(obs)}`;
-      });
-
-      marker.addTo(mapInst);
-      _mapaLayers.push(marker);
-      totalOvts++;
-      totalOvos+=ovos;
-      if(isPos)totalPos++;
+    const marker=L.circleMarker([geo.lat,geo.lng],{
+      radius:isPend?6:isPos?8:5,
+      fillColor:isPend?'#E63946':cor,
+      color:'#fff',
+      weight:2,opacity:1,fillOpacity:isPend?0.55:0.88
     });
+
+    marker.bindPopup(`<div style="font-family:Segoe UI,sans-serif;min-width:200px">
+      <h4 style="margin:0 0 8px;color:#0D2B6E;font-size:.88rem;border-bottom:2px solid #EEF2F7;padding-bottom:4px">
+        OVT ${idOvt}
+      </h4>
+      <table style="width:100%;font-size:.78rem;border-collapse:collapse">
+        <tr><td style="color:#6C757D;padding:2px 4px">Endereço</td><td><b>${geo.endereco}</b></td></tr>
+        <tr><td style="color:#6C757D;padding:2px 4px">Bairro</td><td><b>${r.Bairro||'—'}</b></td></tr>
+        <tr><td style="color:#6C757D;padding:2px 4px">Agente</td><td><b>${r.Agente_Matricula||geo.agente||'—'}</b></td></tr>
+        <tr><td style="color:#6C757D;padding:2px 4px">Ciclo</td><td><b>${r.Ciclo||'—'}</b></td></tr>
+        <tr><td style="color:#6C757D;padding:2px 4px">Coleta</td><td><b>${fmtData(r.Data_Coleta)}</b></td></tr>
+        <tr><td style="color:#6C757D;padding:2px 4px">Nº Ovos</td><td><b style="color:${corPorOvos(ovos)}">${ovos.toLocaleString('pt-BR')}</b></td></tr>
+        <tr><td style="color:#6C757D;padding:2px 4px">IPO Bairro</td><td><b style="color:${nivelIPO(iposBairro[bNorm]||0).c}">${(iposBairro[bNorm]||0).toFixed(1)}%</b></td></tr>
+        <tr><td style="color:#6C757D;padding:2px 4px">Status</td><td>${badgeObs(obs)}</td></tr>
+      </table></div>`);
+
+    marker.on('click',()=>{
+      const painel=document.getElementById('mapaPainel');
+      if(painel)painel.innerHTML=`
+        <b style="color:#0D2B6E">OVT ${idOvt}</b><br>
+        ${geo.endereco}<br>
+        Bairro: <b>${r.Bairro||'—'}</b><br>
+        Ciclo: <b>${r.Ciclo||'—'}</b><br>
+        Ovos: <b style="color:${corPorOvos(ovos)}">${ovos.toLocaleString('pt-BR')}</b><br>
+        Agente: <b>${r.Agente_Matricula||geo.agente||'—'}</b><br>
+        Status: ${badgeObs(obs)}`;
+    });
+
+    marker.addTo(mapInst);
+    _mapaLayers.push(marker);
+    totalOvts++;
+    totalOvos+=ovos;
+    if(isPos)totalPos++;
   });
 
   const totEl=document.getElementById('mapaTotais');
@@ -1021,7 +1164,7 @@ function renderMapaData(d){
       Positivas: <b>${totalPos}</b><br>
       Total Ovos: <b>${totalOvos.toLocaleString('pt-BR')}</b><br>
       IPO: <b style="color:${n.c}">${ipo.toFixed(1)}%</b><br>
-      ${semCoord>0?`<span style="color:#E63946">⚠ ${semCoord} sem coord.</span>`:''}`;
+      ${semCoord>0?`<span style="color:#E63946">⚠ ${semCoord} sem coord. no GEO</span>`:'✅ Todos mapeados'}`;
   }
 
   setTimeout(()=>mapInst.invalidateSize(),200);
