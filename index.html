@@ -7,9 +7,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-/* ══════════════════════════════════════════
-   RESET & VARIÁVEIS
-══════════════════════════════════════════ */
 :root{
   --primary:#0D2B6E;--primary-light:#1A4BA0;--primary-dark:#081A4A;
   --accent:#00B4D8;--green:#2EC4B6;--green-dark:#1A9E95;
@@ -21,8 +18,6 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1E2D40;display:flex;min-height:100vh;overflow-x:hidden}
-
-/* ══ SIDEBAR ══ */
 .sidebar{width:var(--sw);min-height:100vh;background:linear-gradient(180deg,var(--primary-dark),var(--primary) 60%,var(--primary-light));display:flex;flex-direction:column;position:fixed;left:0;top:0;z-index:100;transition:.25s;box-shadow:3px 0 20px rgba(8,26,74,.3)}
 .sidebar.col{width:var(--swc)}
 .sb-head{display:flex;align-items:center;justify-content:space-between;padding:16px 14px;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px}
@@ -42,12 +37,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1E2
 .btn-upload:hover{opacity:.85}
 .sidebar.col .btn-upload{justify-content:center}
 .sidebar.col .btn-upload span{display:none}
-
-/* ══ MAIN ══ */
 .main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;transition:.25s}
 .main.exp{margin-left:var(--swc)}
-
-/* ══ TOPBAR ══ */
 .topbar{background:#fff;padding:12px 24px;box-shadow:var(--shadow);position:sticky;top:0;z-index:90;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px solid var(--primary)}
 .tb-left{display:flex;align-items:center;gap:14px}
 .logo-ds7{height:44px;object-fit:contain}
@@ -59,16 +50,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1E2
 .fg select{padding:6px 10px;border:1.5px solid #D1D9E6;border-radius:8px;font-size:.82rem;color:var(--primary);background:#F7FAFC;cursor:pointer;min-width:100px}
 .btn-pdf{background:var(--red);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s}
 .btn-pdf:hover{opacity:.85}
-
-/* ══ SECTIONS ══ */
 .sec{display:none;padding:22px 24px;animation:fi .3s ease}
 .sec.active{display:block}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .sec-hdr{margin-bottom:18px}
 .sec-hdr h2{font-size:1.2rem;font-weight:800;color:var(--primary);display:flex;align-items:center;gap:9px}
 .sec-hdr h2 i{color:var(--accent)}
-
-/* ══ CARDS ══ */
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
 .card{background:#fff;border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);border-left:4px solid transparent;transition:.2s;cursor:default}
 .card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
@@ -85,16 +72,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1E2
 .cr{border-left-color:#E63946}.cr .c-icon{background:rgba(230,57,70,.1);color:#E63946}.cr .c-val{color:#E63946}
 .cc{border-left-color:#00B4D8}.cc .c-icon{background:rgba(0,180,216,.1);color:#0077B6}.cc .c-val{color:#0077B6}
 .cgr{border-left-color:#6C757D}.cgr .c-icon{background:rgba(108,117,125,.1);color:#6C757D}.cgr .c-val{color:#6C757D}
-
-/* ══ CHARTS ══ */
 .charts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:18px}
 .chart-card{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
 .chart-card.lg{grid-column:span 2}
 .chart-card h3{font-size:.8rem;font-weight:800;color:var(--primary);margin-bottom:14px;text-transform:uppercase;letter-spacing:.03em;display:flex;align-items:center;gap:7px}
 .chart-card h3 i{color:var(--accent)}
 .chart-card canvas{max-height:250px;width:100%!important}
-
-/* ══ TABLES ══ */
 .tbl-card{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}
 .tbl-card h3{font-size:.8rem;font-weight:800;color:var(--primary);margin-bottom:12px;text-transform:uppercase;letter-spacing:.03em}
 .tbl-wrap{overflow-x:auto;max-height:380px;overflow-y:auto}
@@ -111,14 +94,10 @@ tbody td{padding:8px 12px;color:#2D3748}
 .bd{background:#D1ECF1;color:#0C5460}
 .brec{background:#D4EDDA;color:#155724}
 .bok{background:#D4EDDA;color:#155724}
-
-/* ══ FILTER ROW ══ */
 .frow{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .inp-s{padding:8px 12px;border:1.5px solid #D1D9E6;border-radius:8px;font-size:.84rem;color:var(--primary);min-width:240px;transition:.2s}
 .inp-s:focus{outline:none;border-color:var(--accent)}
 .frow select{padding:8px 12px;border:1.5px solid #D1D9E6;border-radius:8px;font-size:.82rem;color:var(--primary);cursor:pointer}
-
-/* ══ RANKING ══ */
 .rank-list{display:flex;flex-direction:column;gap:7px;max-height:280px;overflow-y:auto}
 .rank-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#F7FAFC;border-radius:8px}
 .rank-pos{font-weight:900;font-size:.95rem;color:var(--primary);width:22px;text-align:center}
@@ -126,29 +105,21 @@ tbody td{padding:8px 12px;color:#2D3748}
 .rank-bw{flex:2;height:6px;background:#E2E8F0;border-radius:3px;overflow:hidden}
 .rank-b{height:100%;border-radius:3px;transition:width .6s}
 .rank-v{font-size:.8rem;font-weight:800;color:var(--primary);min-width:42px;text-align:right}
-
-/* ══ MAPA ══ */
-.mapa-wrap{display:flex;gap:14px;height:500px}
+.mapa-wrap{display:flex;gap:14px;height:520px}
 #mapa{flex:1;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-.mapa-leg{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);min-width:155px}
-.mapa-leg h4{font-size:.82rem;font-weight:800;color:var(--primary);margin-bottom:10px;text-transform:uppercase}
-.leg-item{display:flex;align-items:center;gap:8px;font-size:.8rem;margin-bottom:7px}
+.mapa-leg{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);min-width:200px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.mapa-leg h4{font-size:.82rem;font-weight:800;color:var(--primary);margin-bottom:6px;text-transform:uppercase}
+.leg-item{display:flex;align-items:center;gap:8px;font-size:.78rem;margin-bottom:5px}
 .dot{width:13px;height:13px;border-radius:50%;flex-shrink:0}
 .dv{background:#2EC4B6}.da{background:#F9C74F}.dl{background:#F4A261}.dr{background:#E63946}
-
-/* ══ INFO BOX ══ */
 .info-box{background:#F7FAFC;border-radius:10px;padding:14px;font-size:.82rem;color:var(--gray);min-height:100px}
 .info-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #E2E8F0;font-size:.8rem}
 .info-row strong{color:var(--primary)}
-
-/* ══ ESTADO VAZIO ══ */
 .empty-state{text-align:center;padding:50px 20px;color:var(--gray)}
 .empty-state i{font-size:3.5rem;opacity:.25;display:block;margin-bottom:14px}
 .empty-state h3{font-size:1rem;font-weight:700;margin-bottom:6px;color:var(--primary)}
 .empty-state p{font-size:.84rem}
 .empty-state .btn-start{margin-top:16px;background:var(--green);color:#fff;border:none;padding:10px 22px;border-radius:9px;font-size:.88rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-
-/* ══ MODAL ══ */
 .modal-ov{position:fixed;inset:0;background:rgba(8,26,74,.55);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.25s}
 .modal-ov.active{opacity:1;pointer-events:all}
 .modal{background:#fff;border-radius:16px;width:660px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(8,26,74,.28);transform:translateY(14px);transition:.25s;overflow:hidden}
@@ -171,14 +142,10 @@ tbody td{padding:8px 12px;color:#2D3748}
 .btn-ok{background:var(--green);color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px}
 .btn-ok:disabled{opacity:.4;cursor:not-allowed}
 .hidden{display:none!important}
-
-/* ══ TOAST ══ */
 .toast{position:fixed;bottom:26px;right:26px;background:#1E2D40;color:#fff;padding:12px 20px;border-radius:10px;font-size:.85rem;font-weight:600;box-shadow:var(--shadow-md);transform:translateY(70px);opacity:0;transition:.35s;z-index:300;display:flex;align-items:center;gap:9px}
 .toast.show{transform:none;opacity:1}
 .toast.ok{background:var(--green-dark)}
 .toast.err{background:var(--red)}
-
-/* ══ RESPONSIVE ══ */
 @media(max-width:900px){
   .sidebar{width:var(--swc)}
   .sidebar .nav-item span,.sidebar .btn-upload span,.sidebar .sb-logo{display:none}
@@ -193,7 +160,6 @@ tbody td{padding:8px 12px;color:#2D3748}
 </head>
 <body>
 
-<!-- ══════════ SIDEBAR ══════════ -->
 <aside class="sidebar" id="sb">
   <div class="sb-head">
     <svg class="sb-logo" viewBox="0 0 160 44" xmlns="http://www.w3.org/2000/svg">
@@ -221,10 +187,7 @@ tbody td{padding:8px 12px;color:#2D3748}
   </div>
 </aside>
 
-<!-- ══════════ MAIN ══════════ -->
 <main class="main" id="main">
-
-  <!-- TOPBAR -->
   <header class="topbar">
     <div class="tb-left">
       <svg class="logo-ds7" viewBox="0 0 120 44" xmlns="http://www.w3.org/2000/svg">
@@ -250,7 +213,7 @@ tbody td{padding:8px 12px;color:#2D3748}
     </div>
   </header>
 
-  <!-- ── VISÃO GERAL ── -->
+  <!-- VISÃO GERAL -->
   <section class="sec active" id="sec-overview">
     <div id="emptyOverview" class="empty-state">
       <i class="fas fa-database"></i>
@@ -293,7 +256,7 @@ tbody td{padding:8px 12px;color:#2D3748}
     </div>
   </section>
 
-  <!-- ── POR OVITRAMPA ── -->
+  <!-- POR OVITRAMPA -->
   <section class="sec" id="sec-ovitrampa">
     <div class="sec-hdr"><h2><i class="fas fa-crosshairs"></i> Análise por Ovitrampa</h2></div>
     <div class="frow"><input class="inp-s" id="buscaOvt" placeholder="🔍 Digite o ID da Ovitrampa..."/></div>
@@ -309,7 +272,7 @@ tbody td{padding:8px 12px;color:#2D3748}
     </div>
   </section>
 
-  <!-- ── POR BAIRRO ── -->
+  <!-- POR BAIRRO -->
   <section class="sec" id="sec-bairro">
     <div class="sec-hdr"><h2><i class="fas fa-map-marker-alt"></i> Análise por Bairro</h2></div>
     <div class="charts-row">
@@ -322,7 +285,7 @@ tbody td{padding:8px 12px;color:#2D3748}
     </div>
   </section>
 
-  <!-- ── POR CICLO ── -->
+  <!-- POR CICLO -->
   <section class="sec" id="sec-ciclo">
     <div class="sec-hdr"><h2><i class="fas fa-sync-alt"></i> Análise por Ciclo</h2></div>
     <div class="cards-grid" id="cardsCiclo"></div>
@@ -338,7 +301,7 @@ tbody td{padding:8px 12px;color:#2D3748}
     </div>
   </section>
 
-  <!-- ── POR AGENTE ── -->
+  <!-- POR AGENTE -->
   <section class="sec" id="sec-agente">
     <div class="sec-hdr"><h2><i class="fas fa-user-shield"></i> Análise por Agente</h2></div>
     <div class="frow"><input class="inp-s" id="buscaAg" placeholder="🔍 Buscar agente ou matrícula..."/></div>
@@ -354,7 +317,7 @@ tbody td{padding:8px 12px;color:#2D3748}
     </div>
   </section>
 
-  <!-- ── PENDÊNCIAS ── -->
+  <!-- PENDÊNCIAS -->
   <section class="sec" id="sec-pendencias">
     <div class="sec-hdr"><h2><i class="fas fa-exclamation-triangle"></i> Pendências e Ocorrências</h2></div>
     <div class="cards-grid">
@@ -385,25 +348,55 @@ tbody td{padding:8px 12px;color:#2D3748}
     </div>
   </section>
 
-  <!-- ── MAPA ── -->
+  <!-- MAPA -->
   <section class="sec" id="sec-mapa">
     <div class="sec-hdr"><h2><i class="fas fa-map"></i> Mapa de Infestação — DS VII</h2></div>
+    <div class="frow" style="margin-bottom:12px">
+      <select id="mfBairro" style="padding:8px 12px;border:1.5px solid #D1D9E6;border-radius:8px;font-size:.82rem;color:#0D2B6E">
+        <option value="all">Todos os Bairros</option>
+      </select>
+      <select id="mfAgente" style="padding:8px 12px;border:1.5px solid #D1D9E6;border-radius:8px;font-size:.82rem;color:#0D2B6E">
+        <option value="all">Todos os Agentes</option>
+      </select>
+      <select id="mfEscala" style="padding:8px 12px;border:1.5px solid #D1D9E6;border-radius:8px;font-size:.82rem;color:#0D2B6E">
+        <option value="ipo">Cor por IPO do Bairro</option>
+        <option value="ovos">Cor por Nº de Ovos</option>
+      </select>
+      <button onclick="resetFiltrosMapa()" style="padding:8px 14px;border:1.5px solid #D1D9E6;border-radius:8px;font-size:.82rem;cursor:pointer;background:#fff;color:#0D2B6E">
+        <i class="fas fa-undo"></i> Limpar
+      </button>
+    </div>
     <div class="mapa-wrap">
       <div id="mapa"></div>
       <div class="mapa-leg">
-        <h4><i class="fas fa-circle-info"></i> Nível IPO</h4>
-        <div class="leg-item"><span class="dot dv"></span> Baixo (&lt;25%)</div>
-        <div class="leg-item"><span class="dot da"></span> Médio (25–50%)</div>
-        <div class="leg-item"><span class="dot dl"></span> Alto (50–75%)</div>
-        <div class="leg-item"><span class="dot dr"></span> Muito Alto (&gt;75%)</div>
-        <hr style="margin:12px 0;border-color:#EEF2F7">
-        <h4 style="margin-bottom:8px">Legenda</h4>
-        <div class="leg-item" style="font-size:.75rem"><i class="fas fa-circle" style="color:#0077B6;margin-right:4px"></i>Bairro com dados</div>
-        <div class="leg-item" style="font-size:.75rem">Tamanho ∝ Nº de OVTs</div>
+        <div>
+          <h4><i class="fas fa-circle-info"></i> Nível IPO</h4>
+          <div class="leg-item"><span class="dot dv"></span> Baixo (&lt;25%)</div>
+          <div class="leg-item"><span class="dot da"></span> Médio (25–50%)</div>
+          <div class="leg-item"><span class="dot dl"></span> Alto (50–75%)</div>
+          <div class="leg-item"><span class="dot dr"></span> Muito Alto (&gt;75%)</div>
+        </div>
+        <hr style="border-color:#EEF2F7">
+        <div>
+          <h4>Escala de Ovos</h4>
+          <div class="leg-item"><span class="dot" style="background:#90E0EF"></span> 0 ovos</div>
+          <div class="leg-item"><span class="dot" style="background:#00B4D8"></span> 1–100</div>
+          <div class="leg-item"><span class="dot" style="background:#F9C74F"></span> 101–300</div>
+          <div class="leg-item"><span class="dot" style="background:#F4A261"></span> 301–600</div>
+          <div class="leg-item"><span class="dot" style="background:#E63946"></span> &gt;600</div>
+        </div>
+        <hr style="border-color:#EEF2F7">
+        <div>
+          <h4>Painel</h4>
+          <div id="mapaPainel" style="font-size:.75rem;color:#4A5568;line-height:1.8">
+            Clique em um ponto para ver detalhes.
+          </div>
+        </div>
+        <hr style="border-color:#EEF2F7">
+        <div id="mapaTotais" style="font-size:.75rem;color:#4A5568;line-height:2"></div>
       </div>
     </div>
   </section>
-
 </main>
 
 <!-- MODAL UPLOAD -->
@@ -439,27 +432,21 @@ tbody td{padding:8px 12px;color:#2D3748}
 <!-- TOAST -->
 <div class="toast" id="toast"><i class="fas fa-info-circle"></i><span id="toastMsg"></span></div>
 
-<!-- SCRIPTS CDN -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
-/* ══════════════════════════════════════════════════
-   STATE
-══════════════════════════════════════════════════ */
+/* ══ STATE ══ */
 const S = { raw:[], fil:[], f:{ano:'all',ciclo:'all',bairro:'all'} };
 const _ch = {};
 
-/* ══ INIT ══ */
 document.addEventListener('DOMContentLoaded',()=>{
   initSidebar(); initNav(); initFiltros(); initUpload(); initMapa();
   carregarLocal();
 });
 
-/* ══════════════════════════════════════════════════
-   SIDEBAR
-══════════════════════════════════════════════════ */
+/* ══ SIDEBAR ══ */
 function initSidebar(){
   document.getElementById('btnTog').onclick=()=>{
     document.getElementById('sb').classList.toggle('col');
@@ -467,9 +454,7 @@ function initSidebar(){
   };
 }
 
-/* ══════════════════════════════════════════════════
-   NAVEGAÇÃO
-══════════════════════════════════════════════════ */
+/* ══ NAVEGAÇÃO ══ */
 function initNav(){
   document.querySelectorAll('.nav-item').forEach(el=>{
     el.addEventListener('click',e=>{
@@ -497,9 +482,7 @@ function renderSec(s){
   })[s]?.();
 }
 
-/* ══════════════════════════════════════════════════
-   FILTROS
-══════════════════════════════════════════════════ */
+/* ══ FILTROS GLOBAIS ══ */
 function initFiltros(){
   ['fAno','fCiclo','fBairro'].forEach(id=>
     document.getElementById(id).addEventListener('change',aplicarFiltros));
@@ -536,23 +519,17 @@ function aplicarFiltros(){
   if(sa) renderSec(sa.id.replace('sec-',''));
 }
 
-/* ══════════════════════════════════════════════════
-   ✅ CORREÇÃO 1: HELPER PARA LER OBSERVAÇÃO
-   Lê o campo Observacao independente do nome original
-   da coluna (OBS, obs, observacao, observação, etc.)
-══════════════════════════════════════════════════ */
+/* ══ HELPER OBS ══ */
 function getObs(r){
   return String(
-    r.Observacao ?? r.observacao ?? r.Observação ?? r.observação ?? ''
+    r.Observacao??r.observacao??r.Observação??r.observação??''
   ).trim().toUpperCase();
 }
 
-/* ══════════════════════════════════════════════════
-   INDICADORES
-══════════════════════════════════════════════════ */
+/* ══ INDICADORES ══ */
 function calc(d){
   const inst=d.length;
-  const pos=d.filter(r=>Number(r.N_Ovos)>0 && !['F','E','R','D'].includes(getObs(r).charAt(0))).length;
+  const pos=d.filter(r=>Number(r.N_Ovos)>0&&!['F','E','R','D'].includes(getObs(r).charAt(0))).length;
   const ovos=d.reduce((s,r)=>s+Number(r.N_Ovos||0),0);
   const IPO=inst>0?(pos/inst)*100:0;
   const IDO=pos>0?ovos/pos:0;
@@ -565,25 +542,22 @@ function calc(d){
 }
 
 function nivelIPO(v){
-  if(v<25)  return{lbl:'🟢 Baixo',     c:'#2EC4B6'};
-  if(v<50)  return{lbl:'🟡 Médio',     c:'#F9C74F'};
-  if(v<75)  return{lbl:'🟠 Alto',      c:'#F4A261'};
-  return         {lbl:'🔴 Muito Alto', c:'#E63946'};
+  if(v<25)  return{lbl:'🟢 Baixo',    c:'#2EC4B6'};
+  if(v<50)  return{lbl:'🟡 Médio',    c:'#F9C74F'};
+  if(v<75)  return{lbl:'🟠 Alto',     c:'#F4A261'};
+  return         {lbl:'🔴 Muito Alto',c:'#E63946'};
 }
 function nivelIDO(v){
-  if(v<50)  return{lbl:'🟢 Baixo',     c:'#2EC4B6'};
-  if(v<150) return{lbl:'🟡 Médio',     c:'#F9C74F'};
-  if(v<300) return{lbl:'🟠 Alto',      c:'#F4A261'};
-  return         {lbl:'🔴 Muito Alto', c:'#E63946'};
+  if(v<50)  return{lbl:'🟢 Baixo',    c:'#2EC4B6'};
+  if(v<150) return{lbl:'🟡 Médio',    c:'#F9C74F'};
+  if(v<300) return{lbl:'🟠 Alto',     c:'#F4A261'};
+  return         {lbl:'🔴 Muito Alto',c:'#E63946'};
 }
 
-/* ══════════════════════════════════════════════════
-   RENDER OVERVIEW
-══════════════════════════════════════════════════ */
+/* ══ OVERVIEW ══ */
 function renderOverview(d){
   document.getElementById('emptyOverview').classList.add('hidden');
   document.getElementById('dashContent').classList.remove('hidden');
-
   const i=calc(d);
   txt('vIns', i.inst.toLocaleString('pt-BR'));
   txt('vPos', i.pos.toLocaleString('pt-BR'));
@@ -593,10 +567,7 @@ function renderOverview(d){
   txt('vPend',i.pend.toLocaleString('pt-BR'));
   txt('vRec', i.rec.toLocaleString('pt-BR'));
   txt('vOut', (i.r+i.d).toLocaleString('pt-BR'));
-
-  const nI=nivelIPO(i.IPO), nD=nivelIDO(i.IDO);
-  setSub('sIPO',nI); setSub('sIDO',nD);
-
+  setSub('sIPO',nivelIPO(i.IPO)); setSub('sIDO',nivelIDO(i.IDO));
   chEvolucao(d); chOvosCiclo(d); chIPOBairro(d); chStatus(i); chAgente(d);
 }
 
@@ -608,9 +579,7 @@ function setSub(id,n){
   el.style.color=n.c;
 }
 
-/* ══════════════════════════════════════════════════
-   RENDER OVITRAMPA
-══════════════════════════════════════════════════ */
+/* ══ OVITRAMPA ══ */
 function renderOvitrampa(d){
   preencherTabela('tOvt',d.slice(0,300),['ID_Ovitrampa','Bairro','Ciclo','Agente_Matricula','Data_Coleta','N_Ovos','Observacao']);
   const inp=document.getElementById('buscaOvt');
@@ -620,8 +589,7 @@ function renderOvitrampa(d){
 function filtrarOvt(d,q){
   const f=q?d.filter(r=>String(r.ID_Ovitrampa||'').toLowerCase().includes(q.toLowerCase())):d;
   preencherTabela('tOvt',f.slice(0,200),['ID_Ovitrampa','Bairro','Ciclo','Agente_Matricula','Data_Coleta','N_Ovos','Observacao']);
-  chOvtHistorico(f,q);
-  infoOvt(f,q);
+  chOvtHistorico(f,q); infoOvt(f,q);
 }
 
 function infoOvt(d,id){
@@ -635,23 +603,18 @@ function infoOvt(d,id){
     <div class="info-row"><span>Total Ovos</span><strong>${i.ovos.toLocaleString('pt-BR')}</strong></div>
     <div class="info-row"><span>IPO</span><strong style="color:${nivelIPO(i.IPO).c}">${i.IPO.toFixed(2)}%</strong></div>
     <div class="info-row"><span>IDO</span><strong>${i.IDO.toFixed(2)}</strong></div>
-    <div class="info-row"><span>Nível</span><strong style="color:${nivelIPO(i.IPO).c}">${nivelIPO(i.IPO).lbl}</strong></div>
-  `;
+    <div class="info-row"><span>Nível</span><strong style="color:${nivelIPO(i.IPO).c}">${nivelIPO(i.IPO).lbl}</strong></div>`;
 }
 
-/* ══════════════════════════════════════════════════
-   RENDER BAIRRO
-══════════════════════════════════════════════════ */
+/* ══ BAIRRO ══ */
 function renderBairro(d){
   const bairros=[...new Set(d.map(r=>r.Bairro))].filter(Boolean).sort();
   const ipos=bairros.map(b=>calc(d.filter(r=>r.Bairro===b)).IPO);
   const idos=bairros.map(b=>calc(d.filter(r=>r.Bairro===b)).IDO);
   const ovos=bairros.map(b=>calc(d.filter(r=>r.Bairro===b)).ovos);
-
   chBarH('chBIPO',bairros,ipos,'IPO (%)','#0077B6');
   chBarH('chBIDO',bairros,idos,'IDO','#F4A261');
   chBar('chBOv',bairros,ovos,'Ovos','#7B2D8B');
-
   const rank=bairros.map((b,i)=>({b,v:ipos[i]})).sort((a,b)=>b.v-a.v);
   const mx=rank[0]?.v||1;
   document.getElementById('rankB').innerHTML=rank.map((r,i)=>{
@@ -665,15 +628,11 @@ function renderBairro(d){
   }).join('');
 }
 
-/* ══════════════════════════════════════════════════
-   RENDER CICLO
-══════════════════════════════════════════════════ */
+/* ══ CICLO ══ */
 function renderCiclo(d){
   const ciclos=[...new Set(d.map(r=>r.Ciclo))].sort((a,b)=>Number(a)-Number(b));
-  const cc=document.getElementById('cardsCiclo');
-  cc.innerHTML=ciclos.map(c=>{
-    const i=calc(d.filter(r=>r.Ciclo==c));
-    const n=nivelIPO(i.IPO);
+  document.getElementById('cardsCiclo').innerHTML=ciclos.map(c=>{
+    const i=calc(d.filter(r=>r.Ciclo==c));const n=nivelIPO(i.IPO);
     return`<div class="card" style="border-left-color:${n.c}">
       <div class="c-icon" style="background:${n.c}22;color:${n.c}"><i class="fas fa-sync-alt"></i></div>
       <div class="c-info">
@@ -682,11 +641,8 @@ function renderCiclo(d){
         <span class="c-sub" style="background:${n.c}22;color:${n.c}">${i.inst} OVTs · ${i.ovos.toLocaleString('pt-BR')} ovos</span>
       </div></div>`;
   }).join('');
-
-  const tbody=document.querySelector('#tCiclo tbody');
-  tbody.innerHTML=ciclos.map(c=>{
-    const i=calc(d.filter(r=>r.Ciclo==c));
-    const n=nivelIPO(i.IPO);
+  document.querySelector('#tCiclo tbody').innerHTML=ciclos.map(c=>{
+    const i=calc(d.filter(r=>r.Ciclo==c));const n=nivelIPO(i.IPO);
     return`<tr>
       <td><strong>Ciclo ${c}</strong></td>
       <td>${d.find(r=>r.Ciclo==c)?.Ano||'—'}</td>
@@ -697,11 +653,9 @@ function renderCiclo(d){
       <td><span class="badge bf">${i.pend}</span></td>
     </tr>`;
   }).join('');
-
-  const ipos=ciclos.map(c=>calc(d.filter(r=>r.Ciclo==c)).IPO);
-  const idos=ciclos.map(c=>calc(d.filter(r=>r.Ciclo==c)).IDO);
-  chDualLine('chCC',ciclos.map(c=>'C'+c),ipos,idos);
-
+  chDualLine('chCC',ciclos.map(c=>'C'+c),
+    ciclos.map(c=>calc(d.filter(r=>r.Ciclo==c)).IPO),
+    ciclos.map(c=>calc(d.filter(r=>r.Ciclo==c)).IDO));
   const i=calc(d);
   chDoughnut('chCSt',
     ['Positivas','Fechadas','Extraviadas','Recusadas','Desocupadas','Recuperadas'],
@@ -709,29 +663,23 @@ function renderCiclo(d){
     ['#2EC4B6','#E63946','#F4A261','#6C757D','#0077B6','#7B2D8B']);
 }
 
-/* ══════════════════════════════════════════════════
-   RENDER AGENTE
-══════════════════════════════════════════════════ */
+/* ══ AGENTE ══ */
 function renderAgente(d){
   const ags=[...new Set(d.map(r=>r.Agente_Matricula))].filter(Boolean).sort();
-  const tbody=document.querySelector('#tAg tbody');
-  tbody.innerHTML=ags.map(a=>{
+  document.querySelector('#tAg tbody').innerHTML=ags.map(a=>{
     const dd=d.filter(r=>r.Agente_Matricula===a);
-    const i=calc(dd);
-    const n=nivelIPO(i.IPO);
-    const bs=[...new Set(dd.map(r=>r.Bairro))].join(', ');
+    const i=calc(dd);const n=nivelIPO(i.IPO);
     return`<tr>
-      <td><strong>${a}</strong></td><td>${bs}</td>
+      <td><strong>${a}</strong></td>
+      <td>${[...new Set(dd.map(r=>r.Bairro))].join(', ')}</td>
       <td>${i.inst}</td><td>${i.pos}</td>
       <td>${i.ovos.toLocaleString('pt-BR')}</td>
       <td><span style="color:${n.c};font-weight:800">${i.IPO.toFixed(2)}%</span></td>
       <td>${i.IDO.toFixed(2)}</td>
     </tr>`;
   }).join('');
-
   const ovos=ags.map(a=>d.filter(r=>r.Agente_Matricula===a).reduce((s,r)=>s+Number(r.N_Ovos||0),0));
   chBarH('chAgO',ags,ovos,'Ovos','#7B2D8B');
-
   const rank=ags.map((a,i)=>({a,v:ovos[i]})).sort((a,b)=>b.v-a.v);
   const mx=rank[0]?.v||1;
   document.getElementById('rankAg').innerHTML=rank.slice(0,15).map((r,i)=>
@@ -740,9 +688,7 @@ function renderAgente(d){
       <span class="rank-lbl">${r.a}</span>
       <div class="rank-bw"><div class="rank-b" style="width:${(r.v/mx)*100}%;background:#7B2D8B"></div></div>
       <span class="rank-v">${r.v.toLocaleString('pt-BR')}</span>
-    </div>`
-  ).join('');
-
+    </div>`).join('');
   const inp=document.getElementById('buscaAg');
   inp.oninput=()=>{
     const t=inp.value.toLowerCase();
@@ -752,26 +698,18 @@ function renderAgente(d){
   };
 }
 
-/* ══════════════════════════════════════════════════
-   RENDER PENDÊNCIAS
-══════════════════════════════════════════════════ */
+/* ══ PENDÊNCIAS ══ */
 function renderPendencias(d){
   const i=calc(d);
-  txt('pF',i.f); txt('pE',i.e); txt('pR',i.r); txt('pD',i.d); txt('pRec',i.rec);
-
+  txt('pF',i.f);txt('pE',i.e);txt('pR',i.r);txt('pD',i.d);txt('pRec',i.rec);
   chDoughnut('chPT',['Fechadas','Extraviadas','Recusadas','Desocupadas','Recuperadas'],
     [i.f,i.e,i.r,i.d,i.rec],['#E63946','#F4A261','#6C757D','#0077B6','#2EC4B6']);
-
   const bairros=[...new Set(d.map(r=>r.Bairro))].filter(Boolean).sort();
-  const pb=bairros.map(b=>d.filter(r=>r.Bairro===b&&['F','E'].includes(getObs(r).charAt(0))).length);
-  chBar('chPB',bairros,pb,'Pendências','#E63946');
-
+  chBar('chPB',bairros,bairros.map(b=>d.filter(r=>r.Bairro===b&&['F','E'].includes(getObs(r).charAt(0))).length),'Pendências','#E63946');
   const ciclos=[...new Set(d.map(r=>r.Ciclo))].sort((a,b)=>Number(a)-Number(b));
-  const pc=ciclos.map(c=>d.filter(r=>r.Ciclo==c&&['F','E'].includes(getObs(r).charAt(0))).length);
-  chBar('chPC',ciclos.map(c=>'C'+c),pc,'Pendências','#F4A261');
-
+  chBar('chPC',ciclos.map(c=>'C'+c),ciclos.map(c=>d.filter(r=>r.Ciclo==c&&['F','E'].includes(getObs(r).charAt(0))).length),'Pendências','#F4A261');
   renderTabelaPend(d,'all');
-  document.getElementById('fPend').onchange=function(){ renderTabelaPend(d,this.value); };
+  document.getElementById('fPend').onchange=function(){renderTabelaPend(d,this.value);};
 }
 
 function renderTabelaPend(d,tipo){
@@ -780,9 +718,7 @@ function renderTabelaPend(d,tipo){
   preencherTabela('tPend',f.slice(0,300),['ID_Ovitrampa','Bairro','Ciclo','Agente_Matricula','Data_Coleta','Observacao']);
 }
 
-/* ══════════════════════════════════════════════════
-   TABELA GENÉRICA
-══════════════════════════════════════════════════ */
+/* ══ TABELA GENÉRICA ══ */
 function preencherTabela(id,d,cols){
   const tbody=document.querySelector(`#${id} tbody`);
   if(!tbody)return;
@@ -795,14 +731,7 @@ function preencherTabela(id,d,cols){
 }
 
 function badgeObs(v){
-  // v já vem normalizado em maiúsculas via getObs()
-  const m={
-    F:['bf','Fechada'],
-    E:['be','Extraviada'],
-    R:['br','Recusada'],
-    D:['bd','Desocupada'],
-    REC:['brec','Recuperada']
-  };
+  const m={F:['bf','Fechada'],E:['be','Extraviada'],R:['br','Recusada'],D:['bd','Desocupada'],REC:['brec','Recuperada']};
   if(!v||!m[v]) return'<span class="badge bok">Normal</span>';
   return`<span class="badge ${m[v][0]}">${m[v][1]}</span>`;
 }
@@ -814,9 +743,7 @@ function fmtData(v){
   return isNaN(d)?String(v):d.toLocaleDateString('pt-BR');
 }
 
-/* ══════════════════════════════════════════════════
-   GRÁFICOS
-══════════════════════════════════════════════════ */
+/* ══ GRÁFICOS ══ */
 const CORES=['#0D2B6E','#1A4BA0','#00B4D8','#2EC4B6','#F4A261','#E63946','#7B2D8B','#0077B6','#F9C74F','#90BE6D','#577590','#F3722C'];
 
 function getCtx(id){
@@ -914,60 +841,57 @@ function chDoughnut(id,labels,data,colors){
     options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
 }
 
-/* ══════════════════════════════════════════════════
-   MAPA
-══════════════════════════════════════════════════ */
+/* ══ MAPA ══ */
 let mapInst=null, mapInit=false;
+let _mapaLayers=[], _mapaDataAtual=[];
 
-/* ══════════════════════════════════════════════════
-   ✅ CORREÇÃO 2: COORDENADAS DOS BAIRROS
-   - Adicionados bairros faltantes da planilha
-   - Corrigido "ALTO JOSE BONIFACIO" → com e sem acento
-   - Normalização de acento feita via normalizarBairro()
-══════════════════════════════════════════════════ */
 const BAIRRO_COORDS={
-  // ── Bairros originais (mantidos) ──
-  'ALTO JOSE BONIFACIO'    :{lat:-8.0330,lng:-34.9620},
-  'ALTO JOSE DO PINHO'     :{lat:-8.0280,lng:-34.9580},
-  'MACAXEIRA'              :{lat:-8.0220,lng:-34.9540},
-  'NOVA DESCOBERTA'        :{lat:-8.0190,lng:-34.9610},
-  'VASCO DA GAMA'          :{lat:-8.0420,lng:-34.9650},
-  'MANGABEIRA'             :{lat:-8.0500,lng:-34.9560},
-  'DOIS UNIDOS'            :{lat:-8.0150,lng:-34.9450},
-  'AGUA FRIA'              :{lat:-8.0260,lng:-34.9500},
-  'BOMBA DO HEMETERIO'     :{lat:-8.0350,lng:-34.9500},
-  'CAMPO GRANDE'           :{lat:-8.0430,lng:-34.9490},
-  'FUNDAO'                 :{lat:-8.0100,lng:-34.9420},
-  'LINHA DO TIRO'          :{lat:-8.0200,lng:-34.9440},
-  'PORTO DA MADEIRA'       :{lat:-8.0160,lng:-34.9380},
-  'BEBERIBE'               :{lat:-8.0090,lng:-34.9370},
-  // ── ✅ Novos bairros adicionados ──
-  'MORRO DA CONCEICAO'     :{lat:-8.0310,lng:-34.9350},
-  'BREJO DA GUABIRABA'     :{lat:-8.0050,lng:-34.9280},
-  'CORREGO DO JENIPAPO'    :{lat:-8.0070,lng:-34.9310},
-  'BREJO DE BEBERIBE'      :{lat:-8.0060,lng:-34.9390},
-  'PASSARINHO'             :{lat:-8.0120,lng:-34.9310},
-  'GUABIRABA'              :{lat:-8.0020,lng:-34.9260},
-  'PAU FERRO'              :{lat:-7.9980,lng:-34.9240},
+  'ALTO JOSE BONIFACIO' :{lat:-8.0330,lng:-34.9620},
+  'ALTO JOSE DO PINHO'  :{lat:-8.0280,lng:-34.9580},
+  'MACAXEIRA'           :{lat:-8.0220,lng:-34.9540},
+  'NOVA DESCOBERTA'     :{lat:-8.0190,lng:-34.9610},
+  'VASCO DA GAMA'       :{lat:-8.0420,lng:-34.9650},
+  'MANGABEIRA'          :{lat:-8.0500,lng:-34.9560},
+  'DOIS UNIDOS'         :{lat:-8.0150,lng:-34.9450},
+  'AGUA FRIA'           :{lat:-8.0260,lng:-34.9500},
+  'BOMBA DO HEMETERIO'  :{lat:-8.0350,lng:-34.9500},
+  'CAMPO GRANDE'        :{lat:-8.0430,lng:-34.9490},
+  'FUNDAO'              :{lat:-8.0100,lng:-34.9420},
+  'LINHA DO TIRO'       :{lat:-8.0200,lng:-34.9440},
+  'PORTO DA MADEIRA'    :{lat:-8.0160,lng:-34.9380},
+  'BEBERIBE'            :{lat:-8.0090,lng:-34.9370},
+  'MORRO DA CONCEICAO'  :{lat:-8.0310,lng:-34.9350},
+  'BREJO DA GUABIRABA'  :{lat:-8.0050,lng:-34.9280},
+  'CORREGO DO JENIPAPO' :{lat:-8.0070,lng:-34.9310},
+  'BREJO DE BEBERIBE'   :{lat:-8.0060,lng:-34.9390},
+  'PASSARINHO'          :{lat:-8.0120,lng:-34.9310},
+  'GUABIRABA'           :{lat:-8.0020,lng:-34.9260},
+  'PAU FERRO'           :{lat:-7.9980,lng:-34.9240},
 };
 
-/**
- * ✅ CORREÇÃO 3: Normaliza o nome do bairro
- * Remove acentos e converte para maiúsculas,
- * garantindo match mesmo quando a planilha usa acentos
- * (ex: "ALTO JOSÉ BONIFÁCIO" → "ALTO JOSE BONIFACIO")
- */
 function normalizarBairro(nome){
-  return (nome||'')
-    .toUpperCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g,'')
-    .trim();
+  return(nome||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+function corPorOvos(n){
+  if(n===0)  return'#90E0EF';
+  if(n<=100) return'#00B4D8';
+  if(n<=300) return'#F9C74F';
+  if(n<=600) return'#F4A261';
+  return'#E63946';
+}
+
+function jitter(coord,index,total){
+  if(total<=1)return coord;
+  const spread=0.003;
+  const angle=(2*Math.PI*index)/total;
+  const r=spread*(0.4+0.6*(index%3)/2);
+  return{lat:coord.lat+r*Math.sin(angle),lng:coord.lng+r*Math.cos(angle)};
 }
 
 function initMapa(){
   document.querySelector('[data-s="mapa"]').addEventListener('click',()=>{
-    setTimeout(()=>{ if(!mapInit){ criarMapa(); mapInit=true; } },200);
+    setTimeout(()=>{if(!mapInit){criarMapa();mapInit=true;}},200);
   });
 }
 
@@ -976,55 +900,139 @@ function criarMapa(){
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© OpenStreetMap',maxZoom:19
   }).addTo(mapInst);
-  if(S.fil.length) renderMapaData(S.fil);
+  if(S.fil.length)renderMapaData(S.fil);
+}
+
+function limparLayersMapa(){
+  _mapaLayers.forEach(l=>mapInst.removeLayer(l));
+  _mapaLayers=[];
+}
+
+function popularFiltrosMapa(d){
+  const bairros=[...new Set(d.map(r=>(r.Bairro||'').toUpperCase().trim()))].filter(Boolean).sort();
+  const agentes=[...new Set(d.map(r=>r.Agente_Matricula||''))].filter(Boolean).sort();
+  const sb=document.getElementById('mfBairro');
+  const sa=document.getElementById('mfAgente');
+  if(!sb||!sa)return;
+  const vb=sb.value,va=sa.value;
+  sb.innerHTML='<option value="all">Todos os Bairros</option>';
+  bairros.forEach(b=>{const o=document.createElement('option');o.value=b;o.textContent=b;sb.appendChild(o);});
+  if(vb&&vb!=='all')sb.value=vb;
+  sa.innerHTML='<option value="all">Todos os Agentes</option>';
+  agentes.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;sa.appendChild(o);});
+  if(va&&va!=='all')sa.value=va;
+  sb.onchange=sa.onchange=document.getElementById('mfEscala').onchange=()=>renderMapaData(_mapaDataAtual);
+}
+
+function resetFiltrosMapa(){
+  ['mfBairro','mfAgente','mfEscala'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.value=id==='mfEscala'?'ipo':'all';
+  });
+  renderMapaData(_mapaDataAtual);
 }
 
 function renderMapaData(d){
+  _mapaDataAtual=d;
   if(!mapInst){criarMapa();mapInit=true;return;}
-  mapInst.eachLayer(l=>{if(l instanceof L.CircleMarker)mapInst.removeLayer(l);});
+  limparLayersMapa();
+  popularFiltrosMapa(d);
 
-  const bairros=[...new Set(d.map(r=>(r.Bairro||'').toUpperCase().trim()))].filter(Boolean);
+  const fBairro=document.getElementById('mfBairro')?.value||'all';
+  const fAgente=document.getElementById('mfAgente')?.value||'all';
+  const escala =document.getElementById('mfEscala')?.value||'ipo';
 
-  bairros.forEach(b=>{
-    const dd=d.filter(r=>(r.Bairro||'').toUpperCase().trim()===b);
-    const i=calc(dd);
+  let df=[...d];
+  if(fBairro!=='all')df=df.filter(r=>(r.Bairro||'').toUpperCase().trim()===fBairro);
+  if(fAgente!=='all')df=df.filter(r=>r.Agente_Matricula===fAgente);
 
-    // ✅ Usa bairro normalizado (sem acento) para buscar coordenadas
-    const bNorm=normalizarBairro(b);
-    const coords=BAIRRO_COORDS[bNorm];
-    if(!coords)return;
-
-    const n=nivelIPO(i.IPO);
-    const raio=Math.min(18+i.inst*1.5,55);
-    L.circleMarker([coords.lat,coords.lng],{radius:raio,fillColor:n.c,color:'#fff',weight:2,opacity:1,fillOpacity:.75})
-    .bindPopup(`<div style="font-family:Segoe UI,sans-serif;min-width:170px">
-      <h4 style="margin:0 0 8px;color:#0D2B6E;font-size:.88rem">${b}</h4>
-      <table style="width:100%;font-size:.78rem;border-collapse:collapse">
-        <tr><td>Ovitrampas</td><td><b>${i.inst}</b></td></tr>
-        <tr><td>Positivas</td><td><b>${i.pos}</b></td></tr>
-        <tr><td>Total Ovos</td><td><b>${i.ovos.toLocaleString('pt-BR')}</b></td></tr>
-        <tr><td>IPO</td><td><b style="color:${n.c}">${i.IPO.toFixed(2)}%</b></td></tr>
-        <tr><td>IDO</td><td><b>${i.IDO.toFixed(2)}</b></td></tr>
-        <tr><td>Nível</td><td><b style="color:${n.c}">${n.lbl}</b></td></tr>
-      </table></div>`)
-    .addTo(mapInst);
+  const iposBairro={};
+  [...new Set(d.map(r=>normalizarBairro(r.Bairro)))].forEach(b=>{
+    iposBairro[b]=calc(d.filter(r=>normalizarBairro(r.Bairro)===b)).IPO;
   });
+
+  const porBairro={};
+  df.forEach(r=>{
+    const bNorm=normalizarBairro(r.Bairro);
+    if(!porBairro[bNorm])porBairro[bNorm]=[];
+    porBairro[bNorm].push(r);
+  });
+
+  let totalOvts=0,totalOvos=0,totalPos=0,semCoord=0;
+
+  Object.entries(porBairro).forEach(([bNorm,registros])=>{
+    const baseCoord=BAIRRO_COORDS[bNorm];
+    if(!baseCoord){semCoord+=registros.length;return;}
+
+    registros.forEach((r,idx)=>{
+      const ovos=Number(r.N_Ovos||0);
+      const obs=getObs(r);
+      const coord=jitter(baseCoord,idx,registros.length);
+      const isPend=['F','E','R','D'].includes(obs.charAt(0));
+      const isPos=ovos>0&&!isPend;
+      const cor=escala==='ovos'?corPorOvos(ovos):nivelIPO(iposBairro[bNorm]||0).c;
+
+      const marker=L.circleMarker([coord.lat,coord.lng],{
+        radius:isPend?6:isPos?7:5,
+        fillColor:isPend?'#E63946':cor,
+        color:isPend?'#E63946':'#fff',
+        weight:1.5,opacity:1,fillOpacity:isPend?0.5:0.82
+      });
+
+      marker.bindPopup(`<div style="font-family:Segoe UI,sans-serif;min-width:180px">
+        <h4 style="margin:0 0 8px;color:#0D2B6E;font-size:.88rem;border-bottom:2px solid #EEF2F7;padding-bottom:4px">
+          OVT ${r.ID_Ovitrampa||'—'}
+        </h4>
+        <table style="width:100%;font-size:.78rem;border-collapse:collapse">
+          <tr><td style="color:#6C757D">Bairro</td><td><b>${r.Bairro||'—'}</b></td></tr>
+          <tr><td style="color:#6C757D">Agente</td><td><b>${r.Agente_Matricula||'—'}</b></td></tr>
+          <tr><td style="color:#6C757D">Ciclo</td><td><b>${r.Ciclo||'—'}</b></td></tr>
+          <tr><td style="color:#6C757D">Coleta</td><td><b>${fmtData(r.Data_Coleta)}</b></td></tr>
+          <tr><td style="color:#6C757D">Nº Ovos</td><td><b style="color:${corPorOvos(ovos)}">${ovos.toLocaleString('pt-BR')}</b></td></tr>
+          <tr><td style="color:#6C757D">IPO Bairro</td><td><b style="color:${nivelIPO(iposBairro[bNorm]||0).c}">${(iposBairro[bNorm]||0).toFixed(1)}%</b></td></tr>
+          <tr><td style="color:#6C757D">Status</td><td>${badgeObs(obs)}</td></tr>
+        </table></div>`);
+
+      marker.on('click',()=>{
+        const painel=document.getElementById('mapaPainel');
+        if(painel)painel.innerHTML=`
+          <b style="color:#0D2B6E">OVT ${r.ID_Ovitrampa||'—'}</b><br>
+          Bairro: <b>${r.Bairro||'—'}</b><br>
+          Ciclo: <b>${r.Ciclo||'—'}</b><br>
+          Ovos: <b style="color:${corPorOvos(ovos)}">${ovos.toLocaleString('pt-BR')}</b><br>
+          Agente: <b>${r.Agente_Matricula||'—'}</b><br>
+          Status: ${badgeObs(obs)}`;
+      });
+
+      marker.addTo(mapInst);
+      _mapaLayers.push(marker);
+      totalOvts++;
+      totalOvos+=ovos;
+      if(isPos)totalPos++;
+    });
+  });
+
+  const totEl=document.getElementById('mapaTotais');
+  if(totEl){
+    const ipo=totalOvts>0?(totalPos/totalOvts)*100:0;
+    const n=nivelIPO(ipo);
+    totEl.innerHTML=`<b style="color:#0D2B6E">Resumo visível</b><br>
+      OVTs: <b>${totalOvts}</b><br>
+      Positivas: <b>${totalPos}</b><br>
+      Total Ovos: <b>${totalOvos.toLocaleString('pt-BR')}</b><br>
+      IPO: <b style="color:${n.c}">${ipo.toFixed(1)}%</b><br>
+      ${semCoord>0?`<span style="color:#E63946">⚠ ${semCoord} sem coord.</span>`:''}`;
+  }
+
   setTimeout(()=>mapInst.invalidateSize(),200);
 }
 
-/* ══════════════════════════════════════════════════
-   ✅ CORREÇÃO 4: MAPEAMENTO DE COLUNAS (COL_MAP)
-   Adicionadas todas as variantes da coluna OBS:
-   obs, obs., observações, observacoes, etc.
-   Também: normalização dinâmica para colunas
-   que comecem com "obs"
-══════════════════════════════════════════════════ */
+/* ══ MAPEAMENTO DE COLUNAS ══ */
 const COL_MAP={
-  // ── Colunas gerais ──
   'ano':'Ano','ciclo':'Ciclo','ciclos':'Ciclo','ds':'Distrito_Sanitario',
   'bairro':'Bairro','bairro_area':'Bairro_Area',
   'agente / matrícula':'Agente_Matricula','agente/matricula':'Agente_Matricula',
-  'agente_matricula':'Agente_Matricula','qt':'Quantidade','quantidade':'Quantidade',
+  'agente_matricula':'Agente_Matricula',
   'id_ovt':'ID_Ovitrampa','id_ovitrampa':'ID_Ovitrampa',
   'dt_coleta':'Data_Coleta','data_coleta':'Data_Coleta',
   'dt_entrega_apoio':'Data_Entrega_Apoio','dt_entrega_lab':'Data_Entrega_Laboratorio',
@@ -1036,17 +1044,11 @@ const COL_MAP={
   'tecnico_laboratorio':'Tecnico_Laboratorio',
   'data_digitacao':'Data_Digitacao','data_envio_ds':'Data_Envio_DS',
   'data_leitura':'Data_Leitura','data_entrega_apoio':'Data_Entrega_Apoio',
-  // ── ✅ Variantes da coluna OBS/Observação ──
-  'obs':'Observacao',
-  'obs.':'Observacao',
-  'observação':'Observacao',
-  'observacao':'Observacao',
-  'observações':'Observacao',
-  'observacoes':'Observacao',
+  'obs':'Observacao','obs.':'Observacao',
+  'observação':'Observacao','observacao':'Observacao',
+  'observações':'Observacao','observacoes':'Observacao',
   'observação (f/e/r/d/rec)':'Observacao',
-  'status':'Observacao',
-  'situacao':'Observacao',
-  'situação':'Observacao',
+  'status':'Observacao','situacao':'Observacao','situação':'Observacao',
 };
 
 let dadosPrev=[];
@@ -1057,23 +1059,17 @@ function initUpload(){
   document.getElementById('mClose').onclick=()=>modal.classList.remove('active');
   document.getElementById('mCan').onclick=()=>modal.classList.remove('active');
   modal.onclick=e=>{if(e.target===modal)modal.classList.remove('active');};
-
-  document.getElementById('fileIn').onchange=e=>{
-    if(e.target.files[0])processFile(e.target.files[0]);
-  };
-
+  document.getElementById('fileIn').onchange=e=>{if(e.target.files[0])processFile(e.target.files[0]);};
   const dz=document.getElementById('dropZ');
   dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dov');});
   dz.addEventListener('dragleave',()=>dz.classList.remove('dov'));
   dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dov');if(e.dataTransfer.files[0])processFile(e.dataTransfer.files[0]);});
-
   document.getElementById('mOk').onclick=()=>{
     if(!dadosPrev.length)return;
     let final;
     if(S.raw.length){
       const novCiclos=[...new Set(dadosPrev.map(r=>r.Ciclo+'_'+r.Ano))];
-      const base=S.raw.filter(r=>!novCiclos.includes(r.Ciclo+'_'+r.Ano));
-      final=[...base,...dadosPrev];
+      final=[...S.raw.filter(r=>!novCiclos.includes(r.Ciclo+'_'+r.Ano)),...dadosPrev];
       toast(`✅ Merge: ${dadosPrev.length} novos registros adicionados!`,'ok');
     }else{
       final=dadosPrev;
@@ -1100,23 +1096,14 @@ function processFile(file){
   r.readAsArrayBuffer(file);
 }
 
-/* ✅ normCols atualizado: detecta colunas iniciadas com "obs" dinamicamente */
 function normCols(raw){
   if(!raw.length)return[];
   const mapa={};
   Object.keys(raw[0]).forEach(col=>{
     const k=col.toLowerCase().trim();
-    // Mapeamento direto via tabela
-    if(COL_MAP[k]){
-      mapa[col]=COL_MAP[k];
-    }
-    // ✅ Fallback dinâmico: qualquer coluna que comece com "obs" → Observacao
-    else if(k.startsWith('obs')){
-      mapa[col]='Observacao';
-    }
-    else{
-      mapa[col]=col;
-    }
+    if(COL_MAP[k])mapa[col]=COL_MAP[k];
+    else if(k.startsWith('obs'))mapa[col]='Observacao';
+    else mapa[col]=col;
   });
   return raw.map(row=>{
     const n={};
@@ -1130,9 +1117,9 @@ function mostrarPreview(nome,d){
   document.getElementById('prevNome').textContent=nome;
   document.getElementById('prevQtd').textContent=d.length+' registros encontrados';
   const cols=Object.keys(d[0]||{}).slice(0,7);
-  const tbl=document.getElementById('tPrev');
-  tbl.innerHTML=`<thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
-  <tbody>${d.slice(0,6).map(r=>`<tr>${cols.map(c=>`<td>${r[c]??''}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  document.getElementById('tPrev').innerHTML=`
+    <thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+    <tbody>${d.slice(0,6).map(r=>`<tr>${cols.map(c=>`<td>${r[c]??''}</td>`).join('')}</tr>`).join('')}</tbody>`;
 }
 
 function resetModal(){
@@ -1142,9 +1129,7 @@ function resetModal(){
   document.getElementById('fileIn').value='';
 }
 
-/* ══════════════════════════════════════════════════
-   PERSISTÊNCIA
-══════════════════════════════════════════════════ */
+/* ══ PERSISTÊNCIA ══ */
 function carregarLocal(){
   try{
     const raw=localStorage.getItem('ovt_ds7');
@@ -1155,16 +1140,14 @@ function salvarLocal(d){
   try{localStorage.setItem('ovt_ds7',JSON.stringify(d));}catch(e){}
 }
 function processarDados(d){
-  S.raw=d; S.fil=[...d];
+  S.raw=d;S.fil=[...d];
   popularFiltros(d);
   renderOverview(d);
   const sa=document.querySelector('.sec.active');
   if(sa){const id=sa.id.replace('sec-','');if(id!=='overview')renderSec(id);}
 }
 
-/* ══════════════════════════════════════════════════
-   UTILS
-══════════════════════════════════════════════════ */
+/* ══ UTILS ══ */
 function txt(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 function toast(msg,tipo=''){
   const t=document.getElementById('toast');
